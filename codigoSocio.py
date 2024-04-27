@@ -15,52 +15,38 @@ db = SQLAlchemy(app)    # Crear el objeto db de la clase SQLAlchemy que recibe c
 class Socio(db.model):
     
     id_socio = db.Column(db.Integer, primary_key=True) # crea las columnas para los registros de la DB
-    nombre_socio = db.Column(db.String(80), unique=True, nullable=False)
-    apellidos_socio = db.Column(db.String(80), unique=True, nullable=False)
-    edad_socio = db.Columb(db.Integer, nullable=False)
-    direccion_de_entrega = db.Column(db.String(200), nullable=False)
-    codigo_postal = db.Columb(db.Integer, nullable=False)
-    localidad = db.Column(db.String(80), nullable=False)
-    provincia = db.Column(db.String(80), nullable=False)
-    telefono = db.Columb(db.Integer, nullable=False)
+    nombre = db.Column(db.String(80), unique=True, nullable=False)
+    apellido = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
-    login = db.Column(db.Text, nullable=False)
-    passwd = db.Column(db.Text, nullable=False)
-    fondo = db.Columb(db.Integer, nullable=False)
+    password = db.Column(db.Text, nullable=False)
+    username = db.Column(db.Text, nullable=False)
     
-    def __init__(self, id_socio, nombre_socio, apellido_socio, edad_socio, direccion_de_entrega, codigo_postal, localidad, provincia, telefono, email, login, passwd, fondo): #Método constructor de la clase socio
+    def __init__(self, id_socio, nombre, apellido, email, password, username): #Método constructor de la clase socio
         
         self.id_socio = id_socio
-        self.nombre_socio = nombre_socio
-        self.apellidos_socio = apellido_socio
-        self.edad_socio = edad_socio
-        self.direccion_de_entrega = direccion_de_entrega
-        self.codigo_postal = codigo_postal
-        self.localidad = localidad
-        self.provincia = provincia
-        self.telefono = telefono
+        self.nombre = nombre
+        self.apellido = apellido
         self.email = email
-        self.login = login
-        self.passwd = passwd
-        self.fondo = fondo
+        self.password = password
+        self.username = username
         
     def __repr__(self):
         
-        return f'Socio: {self.nombre_socio} {self.apellidos_socio}, {self.edad_socio} años, dirección: {self.direccion_de_entrega} - {self.codigo_postal} {self.localidad} ({self.provincia}), teléfono: {self.telefono}, correo electrónico: {self.email}.'
+        return f'Socio: {self.nombre} {self.apellido}, correo electrónico: {self.email}.'
     
-    def registro(self, nombre_socio, login, passwd):
-        self.nombre_socio = nombre_socio
-        self.login = login
-        self.passwd = passwd
-        return f'{self.nombre_socio} se ha registrado como socio con el login {self.login} y el password {self.passwd}.'
+    def registro(self, nombre, username, password):
+        self.nombre = nombre
+        self.username = username
+        self.password = password
+        return f'{self.nombre} se ha registrado como socio con el login {self.username} y el password {self.password}.'
     
     def logueo(self):
         pass
     
-    def recuperacion(self, email, passwd):
+    def recuperacion(self, email, password):
         pass
     
-    def cerrar_sesion(self, login, passwd):
+    def cerrar_sesion(self, username, password):
         pass
     
     def proponer_productos(self, Producto.nombre, Producto.caracteristicas, Producto.imagen):
