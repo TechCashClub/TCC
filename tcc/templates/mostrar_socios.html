@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Socios</title>
+</head>
+<body>
+    <h1>Socios Registrados</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Nombre de Socio</th>
+        </tr>
+        {% for socio in socios %}
+        <tr>
+            <td>{{ socio.id }}</td>
+            <td>{{ socio.socio }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

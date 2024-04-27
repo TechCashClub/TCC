@@ -49,6 +49,10 @@ def login():
 
    return redirect(url_for('index'))
 
+@app.route('/socios')
+def mostrar_socios():
+    socios = Socio.query.all()  # Recupera todos los socios de la base de datos
+    return render_template('mostrar_socios.html', socios=socios)
 
 
 
