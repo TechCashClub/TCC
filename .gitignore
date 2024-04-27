@@ -1,0 +1,5 @@
+/test-env
+/__pychache__
+.env
+/tcc/.env
+/tcc/static/sing-in.css
