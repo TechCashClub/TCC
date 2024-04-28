@@ -3,20 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Listado de Socios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .center-div {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .logo {
+            width: 30%;  /* tamaño del logo */
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Socios Registrados</h1>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Nombre de Socio</th>
-        </tr>
-        {% for socio in socios %}
-        <tr>
-            <td>{{ socio.id }}</td>
-            <td>{{ socio.socio }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="center-div">
+        <img src="/static/img/logo.svg" alt="Logotipo de la Empresa" class="img-fluid logo">
+        <h3>Listado de Socios</h3>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Email</th>
+                        <th>Usuario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                        {% for socio in socios %}
+                        <tr>
+                            <td>{{ socio.id_socio }}</td>
+                            <td>{{ socio.nombre }}</td>
+                            <td>{{ socio.apellido }}</td>
+                            <td>{{ socio.email }}</td>
+                            <td>{{ socio.username }}</td>
+                        </tr>
+                        {% endfor %}
+                    
+                     
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
+

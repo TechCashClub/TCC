@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+from sqlalchemy.sql import func
 from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash
 import os
 
 load_dotenv()  #Carga las variables de entorno desde .env
@@ -18,19 +21,72 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-#clase Socio
+#Definición de clases: ----------------------------------------------------------------------------------------------
+"""
+class Admin(db.Model):
+    id_admin = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    apellido = db.Column(db.String(100))
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    productos = db.relationship('Producto', backref='admin', lazy=True)
 
+# Tabla de asociación para la relación N:N entre Socios y Productos
+socios_productos = db.Table('socios_productos',
+    db.Column('id_socio', db.Integer, db.ForeignKey('socio.id_socio'), primary_key=True),
+    db.Column('id_producto', db.Integer, db.ForeignKey('producto.id_producto'), primary_key=True)
+)
+
+class Producto(db.Model):
+    id_producto = db.Column(db.Integer, primary_key=True)
+    admin = db.Column(db.Integer, db.ForeignKey('admin.id_admin'), nullable=False)
+    nombre = db.Column(db.String(100), unique=True, nullable=False)
+    marca = db.Column(db.String(100), nullable=False)
+    caracteristicas = db.Column(db.Text, nullable=False) # tipo Text ???-------- Limitar a 1000 caracteres!!!
+    ruta_imagen = db.Column(db.String(250), nullable=True) # tipo Imagen ???----- establecer ruta a la imagen
+    transaccion = db.Column(db.String(100), unique=True, nullable=True)
+    precio_oficial = db.Column(db.Float, nullable=False)
+    precio_descuento = db.Column(db.Float, nullable=True)
+    fecha_insercion = db.Column(db.DateTime, default=func.now()) # importar paquete DateTime
+
+
+    socios = db.relationship('Socio', secondary=socios_productos, backref=db.backref('productos', lazy='dynamic'))
+"""
 class Socio(db.Model):
+    id_socio = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), unique=False, nullable=False)
+    apellido = db.Column(db.String(100), unique=False, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(512), nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+                         
+    # ... otros campos? ...
 
-   id = db.Column(db.Integer, primary_key = True)
-   socio = db.Column(db.String(80), unique = True, nullable = False)
-   password = db.Column(db.String(120), nullable= False)
 
+#--------------------------------------------------------------------------------------------------------------------
 
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+        email = request.form['email']
+        password = generate_password_hash(request.form['password'])
+        username = request.form['username']
 
+        nuevo_socio = Socio(nombre=nombre, apellido=apellido, email=email, password=password, username=username)
+        db.session.add(nuevo_socio)
+        db.session.commit()
 
+        return redirect(url_for('pagina_registrado'))
+    return render_template('registro.html')
 
+@app.route('/registrado')
+def pagina_registrado():
+    return '<h1>Registro completado con éxito</h1>'
 
+"""
 #Aplicación con las rutas y las vistas...>
 
 @app.route('/')   # La ruta
@@ -41,18 +97,18 @@ def index():  # La vista
 @app.route('/login', methods=['POST'])
 def login():
 
-   socio = request.form['socio']
+   nombre = request.form['nombre']
    password = request.form['password']
-   nuevo_socio = Socio(socio = socio, password = password)
+   nuevo_socio = Socio(nombre = nombre, password = password)
    db.session.add(nuevo_socio)
    db.session.commit()
 
    return redirect(url_for('index'))
-
+"""
 @app.route('/socios')
 def mostrar_socios():
     socios = Socio.query.all()  # Recupera todos los socios de la base de datos
-    return render_template('mostrar_socios.html', socios=socios)
+    return render_template('mostrar_socios.html', socios = socios)
 
 
 
