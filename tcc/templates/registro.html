@@ -1,3 +1,4 @@
+{% extends 'base.html' %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -23,7 +24,7 @@
         }
     </style>
 </head>
-<body>
+<body>{% block content %}
     <div class="center-form">
         <div class="form-width">
     <div class="container mt-5">
@@ -59,6 +60,6 @@
     </form>
 </div>
 </div>
-</div>
+</div>{% endblock %}
 </body>
 </html>

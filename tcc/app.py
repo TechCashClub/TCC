@@ -19,6 +19,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+
 db = SQLAlchemy(app)
 
 #Definición de clases: ----------------------------------------------------------------------------------------------
@@ -64,6 +65,14 @@ class Socio(db.Model):
 
 
 #--------------------------------------------------------------------------------------------------------------------
+
+@app.route('/', methods=['GET','POST']) # RUTA INICIAL DE LA APLICACIÓN
+def index():
+
+    return render_template("base.html")
+
+
+
 
 @app.route('/registro', methods=['GET', 'POST'])  # RUTA DE REGISTRO DE LOS SOCIOS
 def registro():

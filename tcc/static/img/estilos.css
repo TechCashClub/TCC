@@ -1,0 +1,13 @@
+/* Estilos globales */
+.container {
+    max-width: 400px; /* Ajusta este valor según tus necesidades */
+    margin: auto; /* Centra el contenedor en la página */
+    padding: 20px;
+}
+
+.form-container {
+    background-color: #f8f9fa; /* Un fondo claro para el formulario */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave para el formulario */
+}
