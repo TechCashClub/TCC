@@ -98,6 +98,25 @@ def eliminar_socio(id):
     #flash('Socio eliminado con éxito.', 'success')
     return redirect(url_for('mostrar_socios'))
 
+@app.route('/socio/<int:id_socio>/editar', methods=['GET', 'POST'])
+def editar_socio(id_socio):
+    socio = Socio.query.get_or_404(id_socio)
+    if request.method == 'POST':
+        socio.nombre = request.form['nombre']
+        socio.apellido = request.form['apellido']
+        socio.email = request.form['email']
+        socio.username = request.form['username']
+        # Aquí deberías agregar validaciones para asegurar que email y username sigan siendo únicos, etc.
+        try:
+            db.session.commit()
+            #flash('Los datos del socio han sido actualizados con éxito.', 'success')
+            return redirect(url_for('mostrar_socios'))
+        except:
+            db.session.rollback()
+            #flash('Error al actualizar los datos. Asegúrate de que el email y nombre de usuario sean únicos.', 'error')
+            return redirect(url_for('editar_socio', socio= socio))
+    
+    return render_template('editar_socio.html', socio = socio)    
 
 @app.route('/registrado')  # RUTA DE CONFIRMACIÓN DE SOCIO REGISTRADO
 def pagina_registrado():
@@ -125,25 +144,7 @@ def registro_productos():
 def producto_registrado():
     return redirect(url_for('mostrar_productos'))
 
-"""
-#Aplicación con las rutas y las vistas...>
 
-@app.route('/')   # La ruta
-def index():  # La vista
-   
-   return render_template("login.html")
-
-@app.route('/login', methods=['POST'])
-def login():
-
-   nombre = request.form['nombre']
-   password = request.form['password']
-   nuevo_socio = Socio(nombre = nombre, password = password)
-   db.session.add(nuevo_socio)
-   db.session.commit()
-
-   return redirect(url_for('index'))
-"""
 @app.route('/socios')  #RUTA PARA MOSTRAR TODOS LOS SOCIOS
 def mostrar_socios():
     socios = Socio.query.all()  # Recupera todos los socios de la base de datos
