@@ -1,0 +1,27 @@
+/* Estilos globales */
+.container {
+    max-width: 850px; /* Ajusta este valor según tus necesidades */
+    margin: auto; /* Centra el contenedor en la página */
+    padding: 20px;
+}
+
+.form-container {
+    background-color: #f8f9fa; /* Un fondo claro para el formulario */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave para el formulario */
+}
+
+.card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.05)!important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #4d606c;  /* Cambia este color al que prefieras */
+    color:#f8f9fa;
+}

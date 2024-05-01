@@ -90,9 +90,18 @@ def registro():
         return redirect(url_for('pagina_registrado'))
     return render_template('registro.html')
 
+@app.route('/eliminar_socio/<int:id>', methods=['POST']) # RUTA PARA BORRAR REGISTRO DE SOCIO
+def eliminar_socio(id):
+    socio = Socio.query.get_or_404(id)
+    db.session.delete(socio)
+    db.session.commit()
+    #flash('Socio eliminado con éxito.', 'success')
+    return redirect(url_for('mostrar_socios'))
+
+
 @app.route('/registrado')  # RUTA DE CONFIRMACIÓN DE SOCIO REGISTRADO
 def pagina_registrado():
-    return '<h1>Registro completado con éxito</h1>'
+    return redirect(url_for('mostrar_socios'))
 
 
 
@@ -114,7 +123,7 @@ def registro_productos():
 
 @app.route('/registrado_producto')  #RUTA DE CONFIRMACIÓN DE PRODUCTO REGISTRADO
 def producto_registrado():
-    return '<h1>Registro completado con éxito</h1>'
+    return redirect(url_for('mostrar_productos'))
 
 """
 #Aplicación con las rutas y las vistas...>
@@ -144,6 +153,14 @@ def mostrar_socios():
 def mostrar_productos():
     productos = Producto.query.all() # Recupera todos los socios de la base de datos
     return render_template('mostrar_productos.html', productos = productos)
+
+@app.route('/eliminar/<int:id>', methods=['POST']) #RUTA PARA ELIMINAR UN PRODUCTO 
+def eliminar_producto(id):
+    productos = Producto.query.get_or_404(id)
+    db.session.delete(productos)
+    db.session.commit()
+    #flash('Producto eliminado con éxito.', 'success')
+    return redirect(url_for('mostrar_productos'))
 
 if __name__ == '__main__':
     with app.app_context(): # Crea un contexto de aplicación, esto es necesario para operaciones que están fuera del flujo normal de de solicitudes, como la creación de tablas al inicio de la aplicación.

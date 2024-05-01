@@ -12,7 +12,7 @@
         <img src="/static/img/logo.svg" alt="Logotipo de la Empresa" class="img-fluid logo">
         <h3>Listado de Socios</h3>
         <div class="table-responsive">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -31,6 +31,13 @@
                             <td>{{ socio.apellido }}</td>
                             <td>{{ socio.email }}</td>
                             <td>{{ socio.username }}</td>
+                            <td>
+                                <!-- Formulario para eliminar el socio -->
+                                <form action="{{ url_for('eliminar_socio', id=socio.id_socio) }}" method="post" onsubmit="return confirm('¿Estás seguro de querer eliminar este socio?');">
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+
+                            </td>
                         </tr>
                         {% endfor %}
                     
