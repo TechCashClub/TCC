@@ -1,18 +1,23 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, flash, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
 from dotenv import load_dotenv
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
+from functools import wraps
 
 load_dotenv()  #Carga las variables de entorno desde .env
 
 #database_url = os.getenv('DATABASE_URL')
 
 
-
+#Clave secreta de FLASK
 app = Flask(__name__)
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
+
+admin_username = os.getenv('ADMIN_USERNAME')
+admin_password_hash = os.getenv('ADMIN_PASSWORD_HASH')
 
 #Configurar la URI de la base de datos
 
@@ -61,20 +66,84 @@ class Socio(db.Model):
     password = db.Column(db.String(512), nullable=False)
     username = db.Column(db.String(100), unique=True, nullable=False)
                          
-    # ... otros campos? ...
+    
 
 
 #--------------------------------------------------------------------------------------------------------------------
+# Decorador para restringir acceso a las rutas solo administrador
+    
+    
 
-@app.route('/', methods=['GET','POST']) # RUTA INICIAL DE LA APLICACIÓN
+
+from functools import wraps
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            flash("Necesitas iniciar sesión para acceder a esta página.", "warning")
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/index', methods=['GET','POST']) # RUTA INICIAL DE LA 
+@login_required
 def index():
+    if session.get('logged_in'):
+        return render_template("base.html")
+    else:
+        return redirect(url_for('login'))
+    #return render_template('login.html')
+    
 
-    return render_template("base.html")
+@app.route('/', methods=['GET','POST']) #RUTA AL LOGIN
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        admin_username = os.getenv('ADMIN_USERNAME')
+        admin_password_hash = os.getenv('ADMIN_PASSWORD_HASH')
+
+        if username == admin_username and check_password_hash(admin_password_hash, password):
+            session['logged_in'] = True  # Indica que el administrador está logueado
+            return redirect(url_for('index'))
+        else:
+            flash('Usuario o contraseña incorrectos', 'danger')
+
+    return render_template('login.html')
+
+
+
+
+
+@app.route('/logout')
+def logout():
+    session.clear()  # Limpia la sesión para remover cualquier dato del usuario logueado
+    return redirect(url_for('login'))  # Redirige al usuario a la página de login
+
+
+
+
 
 
 
 
 @app.route('/registro', methods=['GET', 'POST'])  # RUTA DE REGISTRO DE LOS SOCIOS
+@login_required
 def registro():
     if request.method == 'POST':
         nombre = request.form['nombre']
@@ -91,6 +160,7 @@ def registro():
     return render_template('registro.html')
 
 @app.route('/eliminar_socio/<int:id>', methods=['POST']) # RUTA PARA BORRAR REGISTRO DE SOCIO
+@login_required
 def eliminar_socio(id):
     socio = Socio.query.get_or_404(id)
     db.session.delete(socio)
@@ -99,6 +169,7 @@ def eliminar_socio(id):
     return redirect(url_for('mostrar_socios'))
 
 @app.route('/socio/<int:id_socio>/editar', methods=['GET', 'POST'])
+@login_required
 def editar_socio(id_socio):
     socio = Socio.query.get_or_404(id_socio)
     if request.method == 'POST':
@@ -119,12 +190,14 @@ def editar_socio(id_socio):
     return render_template('editar_socio.html', socio = socio)    
 
 @app.route('/registrado')  # RUTA DE CONFIRMACIÓN DE SOCIO REGISTRADO
+@login_required
 def pagina_registrado():
     return redirect(url_for('mostrar_socios'))
 
 
 
 @app.route('/registro_productos', methods=['GET', 'POST'])  #RUTA DE REGISTRO DE LOS PRODUCTOS
+@login_required
 def registro_productos():
     if request.method == 'POST':
         nombre = request.form['nombre']
@@ -141,21 +214,26 @@ def registro_productos():
     return render_template('registro_productos.html')
 
 @app.route('/registrado_producto')  #RUTA DE CONFIRMACIÓN DE PRODUCTO REGISTRADO
+@login_required
 def producto_registrado():
     return redirect(url_for('mostrar_productos'))
 
 
 @app.route('/socios')  #RUTA PARA MOSTRAR TODOS LOS SOCIOS
+@login_required
 def mostrar_socios():
     socios = Socio.query.all()  # Recupera todos los socios de la base de datos
     return render_template('mostrar_socios.html', socios = socios)
 
 @app.route('/productos') #RUTA PARA MOSTRAR TODOS LOS PRODUCTOS
+@login_required
 def mostrar_productos():
+
     productos = Producto.query.all() # Recupera todos los socios de la base de datos
     return render_template('mostrar_productos.html', productos = productos)
 
 @app.route('/eliminar/<int:id>', methods=['POST']) #RUTA PARA ELIMINAR UN PRODUCTO 
+@login_required
 def eliminar_producto(id):
     productos = Producto.query.get_or_404(id)
     db.session.delete(productos)
