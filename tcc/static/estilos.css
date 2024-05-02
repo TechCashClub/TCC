@@ -25,3 +25,8 @@
     background-color: #4d606c;  /* Cambia este color al que prefieras */
     color:#f8f9fa;
 }
+
+.logo {
+    width: 50%; /* Reduce el ancho a la mitad del tamaño original */
+    height: auto; /* Mantiene la proporción del alto respecto al ancho */
+}

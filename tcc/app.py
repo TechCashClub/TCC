@@ -104,7 +104,7 @@ def login_required(f):
 @login_required
 def index():
     if session.get('logged_in'):
-        return render_template("base.html")
+        return render_template("bienvenida.html")
     else:
         return redirect(url_for('login'))
     #return render_template('login.html')
