@@ -10,7 +10,7 @@
 </head>
 <body>{% block content %} 
     <div class="container mt-5">
-        <h1 class="mb-4">Productos Disponibles</h1>
+        <h3 class="mb-4">Productos</h3>
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for producto in productos %}
             <div class="col">
@@ -19,12 +19,12 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ producto.nombre }}</h5>
                         <p class="card-text">
-                            Marca: {{ producto.marca }}<br>
-                            Precio: €{{ producto.precio_oficial }}<br>
+                            <b>Marca:</b> {{ producto.marca }}<br>
+                            <b>Precio:</b> €{{ producto.precio_oficial }}<br>
                             {% if producto.precio_descuento %}
                             Precio con descuento: €{{ producto.precio_descuento }}<br>
                             {% endif %}
-                            Características: {{ producto.caracteristicas }}
+                            <b>Características:</b> {{ producto.caracteristicas }}
                         </p>
                         <!-- Formulario para eliminar el producto -->
                         <form action="{{ url_for('eliminar_producto', id=producto.id_producto) }}" method="post" onsubmit="return confirm('¿Estás seguro de querer eliminar este producto?');">

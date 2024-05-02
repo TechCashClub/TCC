@@ -238,7 +238,7 @@ def eliminar_producto(id):
     productos = Producto.query.get_or_404(id)
     db.session.delete(productos)
     db.session.commit()
-    #flash('Producto eliminado con éxito.', 'success')
+    flash('Producto eliminado con éxito.', 'success')
     return redirect(url_for('mostrar_productos'))
 
 if __name__ == '__main__':
