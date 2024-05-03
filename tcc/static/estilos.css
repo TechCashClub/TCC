@@ -1,4 +1,17 @@
 /* Estilos globales */
+
+
+body.background {
+    
+    background: rgb(2,0,36); 
+
+    background:  radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(56,39,191,1) 15%, rgba(0,138,255,1) 44%); }
+
+
+
+
+
+
 .container {
     max-width: 850px; /* Ajusta este valor según tus necesidades */
     margin: auto; /* Centra el contenedor en la página */
