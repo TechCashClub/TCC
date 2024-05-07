@@ -306,7 +306,8 @@ def producto_registrado():
 @app.route('/socios')  #RUTA PARA MOSTRAR TODOS LOS SOCIOS
 @require_role('admin')
 def mostrar_socios():
-    socios = Socio.query.all()  # Recupera todos los socios de la base de datos
+    #socios = Socio.query.all()  # Recupera todos los socios de la base de datos
+    socios = db.session.query(Socio).filter_by(role='socio').all()
     return render_template('mostrar_socios.html', socios = socios)
 
 @app.route('/productos') #RUTA PARA MOSTRAR TODOS LOS PRODUCTOS
