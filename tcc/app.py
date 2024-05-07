@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy.sql import func
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, UserMixin, login_user, current_user, login_required
 import os
 from functools import wraps
 
@@ -16,6 +17,19 @@ load_dotenv()  #Carga las variables de entorno desde .env
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
 
+#FLASK-LOGIN---------------------------------------------------------------------------
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Esta sería la vista que maneja el inicio de sesión
+
+@login_manager.user_loader
+def load_user(id_socio):
+    return db.session.get(Socio,id_socio) 
+
+#-------------------------------------------------------------------------------------
+
+
 admin_username = os.getenv('ADMIN_USERNAME')
 admin_password_hash = os.getenv('ADMIN_PASSWORD_HASH')
 
@@ -23,6 +37,8 @@ admin_password_hash = os.getenv('ADMIN_PASSWORD_HASH')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
 
 
 db = SQLAlchemy(app)
@@ -58,24 +74,45 @@ class Producto(db.Model):
 
     socios = db.relationship('Socio', secondary=socios_productos, backref=db.backref('productos', lazy='dynamic'))
 
-class Socio(db.Model):
+class Socio(db.Model,UserMixin):
     id_socio = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), unique=False, nullable=False)
     apellido = db.Column(db.String(100), unique=False, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(512), nullable=False)
     username = db.Column(db.String(100), unique=True, nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='socio')
                          
+    def check_password(self, password):
+
+        return check_password_hash(self.password, password)
+
+    def is_active(self):
+
+        return True
     
+    def get_id(self):
 
-
+        return str(self.id_socio)
 #--------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 # Decorador para restringir acceso a las rutas solo administrador
     
     
 
 
-from functools import wraps
+"""
 
 def login_required(f):
     @wraps(f)
@@ -86,6 +123,22 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+"""
+
+
+
+
+
+def require_role(role):
+    def decorator(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_authenticated or current_user.role != role:
+                flash("No tienes permiso para acceder a esta página.")
+                return redirect(url_for('login'))
+            return func(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 
 
@@ -98,18 +151,15 @@ def login_required(f):
 
 
 
-
-
-@app.route('/index', methods=['GET','POST']) # RUTA INICIAL DE LA 
+@app.route('/index', methods=['GET','POST']) # RUTA INICIAL DE LA APP
+@require_role('admin')
 @login_required
 def index():
-    if session.get('logged_in'):
-        return render_template("bienvenida.html")
-    else:
-        return redirect(url_for('login'))
-    #return render_template('login.html')
     
-
+    return render_template("bienvenida.html")
+    
+    
+"""
 @app.route('/', methods=['GET','POST']) #RUTA AL LOGIN
 def login():
     if request.method == 'POST':
@@ -125,7 +175,30 @@ def login():
             flash('Usuario o contraseña incorrectos', 'danger')
 
     return render_template('login.html')
+"""
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        print(f" Username: {username}, Password: {password}") # Debuggeando
+        #usando session para la consulta
+        user = db.session.query(Socio).filter_by(nombre=username).first()
+        print(f"User found: {user}") # Debuggeando
+        
+        if user is not None and user.check_password(password):
+            
 
+            login_user(user)
+            if user.role == 'admin':
+                return redirect(url_for('index'))
+            elif user.role == 'socio':
+                return redirect(url_for('socio', id_socio=user.id_socio))
+            else:
+                flash('Acceso no autorizado.')
+                return redirect(url_for('login'))
+        flash('Nombre de usuario o contraseña incorrecto.')
+    return render_template('login.html')
 
 
 
@@ -138,12 +211,23 @@ def logout():
 
 
 
+@app.route('/socio_dashboard/<int:id_socio>') # DASHBOARD DEL SOCIO
+@require_role('socio')
+def socio(id_socio):
+    info_socio = db.session.get(Socio,id_socio)
+    if not info_socio:
+        return 'Socio no encontrado', 404
+    return render_template('socio.html', nombre= info_socio.nombre, apellido=info_socio.apellido, email=info_socio.email)
+
+
+
+
 
 
 
 
 @app.route('/registro', methods=['GET', 'POST'])  # RUTA DE REGISTRO DE LOS SOCIOS
-@login_required
+@require_role('admin')
 def registro():
     if request.method == 'POST':
         nombre = request.form['nombre']
@@ -160,7 +244,7 @@ def registro():
     return render_template('registro.html')
 
 @app.route('/eliminar_socio/<int:id>', methods=['POST']) # RUTA PARA BORRAR REGISTRO DE SOCIO
-@login_required
+@require_role('admin')
 def eliminar_socio(id):
     socio = Socio.query.get_or_404(id)
     db.session.delete(socio)
@@ -169,7 +253,7 @@ def eliminar_socio(id):
     return redirect(url_for('mostrar_socios'))
 
 @app.route('/socio/<int:id_socio>/editar', methods=['GET', 'POST'])
-@login_required
+@require_role('admin')
 def editar_socio(id_socio):
     socio = Socio.query.get_or_404(id_socio)
     if request.method == 'POST':
@@ -177,7 +261,7 @@ def editar_socio(id_socio):
         socio.apellido = request.form['apellido']
         socio.email = request.form['email']
         socio.username = request.form['username']
-        # Aquí deberías agregar validaciones para asegurar que email y username sigan siendo únicos, etc.
+        # Aquí se debería agregar validaciones para asegurar que email y username sigan siendo únicos, etc.
         try:
             db.session.commit()
             #flash('Los datos del socio han sido actualizados con éxito.', 'success')
@@ -190,14 +274,14 @@ def editar_socio(id_socio):
     return render_template('editar_socio.html', socio = socio)    
 
 @app.route('/registrado')  # RUTA DE CONFIRMACIÓN DE SOCIO REGISTRADO
-@login_required
+@require_role('admin')
 def pagina_registrado():
     return redirect(url_for('mostrar_socios'))
 
 
 
 @app.route('/registro_productos', methods=['GET', 'POST'])  #RUTA DE REGISTRO DE LOS PRODUCTOS
-@login_required
+@require_role('admin')
 def registro_productos():
     if request.method == 'POST':
         nombre = request.form['nombre']
@@ -214,26 +298,26 @@ def registro_productos():
     return render_template('registro_productos.html')
 
 @app.route('/registrado_producto')  #RUTA DE CONFIRMACIÓN DE PRODUCTO REGISTRADO
-@login_required
+@require_role('admin')
 def producto_registrado():
     return redirect(url_for('mostrar_productos'))
 
 
 @app.route('/socios')  #RUTA PARA MOSTRAR TODOS LOS SOCIOS
-@login_required
+@require_role('admin')
 def mostrar_socios():
     socios = Socio.query.all()  # Recupera todos los socios de la base de datos
     return render_template('mostrar_socios.html', socios = socios)
 
 @app.route('/productos') #RUTA PARA MOSTRAR TODOS LOS PRODUCTOS
-@login_required
+@require_role('admin')
 def mostrar_productos():
 
     productos = Producto.query.all() # Recupera todos los socios de la base de datos
     return render_template('mostrar_productos.html', productos = productos)
 
 @app.route('/eliminar/<int:id>', methods=['POST']) #RUTA PARA ELIMINAR UN PRODUCTO 
-@login_required
+@require_role('admin')
 def eliminar_producto(id):
     productos = Producto.query.get_or_404(id)
     db.session.delete(productos)

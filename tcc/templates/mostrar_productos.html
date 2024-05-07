@@ -20,9 +20,9 @@
                         <h5 class="card-title">{{ producto.nombre }}</h5>
                         <p class="card-text">
                             <b>Marca:</b> {{ producto.marca }}<br>
-                            <b>Precio:</b> €{{ producto.precio_oficial }}<br>
+                            <b>Precio:</b> {{ producto.precio_oficial }}€<br>
                             {% if producto.precio_descuento %}
-                            Precio con descuento: €{{ producto.precio_descuento }}<br>
+                            Precio con descuento: {{ producto.precio_descuento }}€<br>
                             {% endif %}
                             <b>Características:</b> {{ producto.caracteristicas }}
                         </p>
