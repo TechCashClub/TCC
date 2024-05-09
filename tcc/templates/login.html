@@ -39,8 +39,21 @@ body {
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Sign In</button>
+                      
+                        <!-- Contenedor de los botones Sign In y Sign Up -->
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                            <button type="submit" class="btn btn-primary">Sign In</button>
+                            <a href="/signup" class="btn btn-secondary">Sign Up</a> 
+                        </div>
+                          <!-- Enlace para recuperar contraseña -->
+                          <div class="mb-3 text-center"><br><br>
+                            <a href="#" class="link-primary">¿Olvidaste la contraseña?</a> <!-- Asegúrate de que la URL lleve a la página correcta -->
+                        </div>
                     </form>
+                </div>
+                <!-- Logotipo en la parte inferior de la tarjeta -->
+                <div class="card-footer text-center">
+                <img src="static/img/placeholder-image.png" alt="Logotipo" style="max-height: 200px;">  <!-- Asegúrate de ajustar la ruta y el tamaño según tus necesidades -->
                 </div>
             </div>
         </div>

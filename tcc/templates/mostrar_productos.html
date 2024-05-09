@@ -6,9 +6,34 @@
     <title>Lista de Productos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='estilos.css') }}" rel="stylesheet">
-
+    <style>
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 300px!important; /* Incrementar si es necesario */
+        }
+        .card:hover {
+            transform: scale(1.05); /* Aumentar ligeramente si el solapamiento persiste */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1000; /* Asegura que la tarjeta en hover esté sobre las otras */
+            position: relative; /* Necesario para que z-index funcione correctamente */
+        }
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+    </style>
 </head>
-<body>{% block content %} 
+<body>
+{% block content %}
     <div class="container mt-5">
         <h3 class="mb-4">Productos</h3>
         <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -19,27 +44,31 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ producto.nombre }}</h5>
                         <p class="card-text">
-                            <b>Marca:</b> {{ producto.marca }}<br>
-                            <b>Precio:</b> {{ producto.precio_oficial }}€<br>
+                            Marca: {{ producto.marca }}<br>
+                            Precio: {{ producto.precio_oficial }}€<br>
                             {% if producto.precio_descuento %}
                             Precio con descuento: {{ producto.precio_descuento }}€<br>
                             {% endif %}
-                            <b>Características:</b> {{ producto.caracteristicas }}
+                            Características: {{ producto.caracteristicas }}
                         </p>
-                        <!-- Formulario para eliminar el producto -->
+                        {% if current_user.is_authenticated and current_user.role == 'admin' %}
                         <form action="{{ url_for('eliminar_producto', id=producto.id_producto) }}" method="post" onsubmit="return confirm('¿Estás seguro de querer eliminar este producto?');">
                             <button type="submit" class="btn btn-danger">Eliminar</button>
                         </form>
-                        
-
+                        {% endif %}
                     </div>
                     <div class="card-footer">
                         <small class="text-muted">Última actualización el {{ producto.fecha_insercion.strftime('%d/%m/%Y') }}</small>
                     </div>
-                </div>
+                </div><br><br>
             </div>
             {% endfor %}
         </div>
-    </div>{% endblock %}
+    </div>
+{% endblock %}
 </body>
 </html>
+
+
+           
+

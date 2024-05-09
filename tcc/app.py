@@ -4,9 +4,23 @@ from datetime import datetime
 from sqlalchemy.sql import func
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, current_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, current_user, login_required, logout_user
 import os
 from functools import wraps
+
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, Length
+
+class FormularioRegistro(FlaskForm):
+
+    nombre = StringField('Nombre', validators=[DataRequired()])
+    apellido = StringField('Apellido', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    username = StringField('Nombre de usuario', validators=[DataRequired()])
+    submit = SubmitField('Guardar')
+
 
 load_dotenv()  #Carga las variables de entorno desde .env
 
@@ -80,7 +94,7 @@ class Socio(db.Model,UserMixin):
     apellido = db.Column(db.String(100), unique=False, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(512), nullable=False)
-    username = db.Column(db.String(100), unique=True, nullable=False)
+    username = db.Column(db.String(100), unique=False, nullable=False)
     role = db.Column(db.String(20), nullable=False, default='socio')
                          
     def check_password(self, password):
@@ -97,6 +111,30 @@ class Socio(db.Model,UserMixin):
 #--------------------------------------------------------------------------------------------------------------------
 
 
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = FormularioRegistro()
+    if form.validate_on_submit():
+        usuario_existente = Socio.query.filter_by(email=form.email.data).first() or Socio.query.filter_by(username=form.username.data).first()
+        if usuario_existente:
+            flash('El email o nombre de usuario ya está registrado.', 'warning')
+            return redirect(url_for('signup'))
+        
+        # Hashear la contraseña antes de guardarla
+        hashed_password = generate_password_hash(form.password.data)
+        
+        nuevo_socio = Socio(
+            nombre=form.nombre.data,
+            apellido=form.apellido.data,
+            email=form.email.data,
+            password=hashed_password,
+            username=form.username.data
+        )
+        db.session.add(nuevo_socio)
+        db.session.commit()
+        flash('Registro completado con éxito.', 'success')
+        return redirect(url_for('login'))
+    return render_template('formulario_registro.html', form=form)
 
 
 
@@ -152,7 +190,7 @@ def require_role(role):
 
 
 @app.route('/index', methods=['GET','POST']) # RUTA INICIAL DE LA APP
-@require_role('admin')
+#@require_role('admin')
 @login_required
 def index():
     
@@ -205,7 +243,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.clear()  # Limpia la sesión para remover cualquier dato del usuario logueado
+    session.clear() 
+    logout_user() # Limpia la sesión para remover cualquier dato del usuario logueado
     return redirect(url_for('login'))  # Redirige al usuario a la página de login
 
 
@@ -251,6 +290,12 @@ def eliminar_socio(id):
     db.session.commit()
     #flash('Socio eliminado con éxito.', 'success')
     return redirect(url_for('mostrar_socios'))
+
+
+
+
+
+
 
 @app.route('/socio/<int:id_socio>/editar', methods=['GET', 'POST'])
 @require_role('admin')
@@ -311,7 +356,7 @@ def mostrar_socios():
     return render_template('mostrar_socios.html', socios = socios)
 
 @app.route('/productos') #RUTA PARA MOSTRAR TODOS LOS PRODUCTOS
-@require_role('admin')
+#@require_role('admin')
 def mostrar_productos():
 
     productos = Producto.query.all() # Recupera todos los socios de la base de datos
