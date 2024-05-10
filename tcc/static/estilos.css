@@ -51,6 +51,10 @@ background-repeat: no-repeat!important;
 /* Asegura que la imagen cubra toda el área disponible */
 background-size: cover!important;
 
+min-height: 100vh!important; /* Utiliza el 100% del viewport height */
+
+background-attachment: fixed; /* Mantiene la imagen fija mientras el contenido se desplaza */
+
 
 
 
