@@ -28,6 +28,7 @@ height: 0px!important;
  html, body {   
     
 height: 100%;
+width: 100%;
 margin:0;
 
 padding-top: 0px; /* Espacio para la navbar */
@@ -35,6 +36,17 @@ padding-top: 0px; /* Espacio para la navbar */
 
     
 background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.dev/svgjs' width='2000' height='2000' preserveAspectRatio='none' viewBox='0 0 2000 2000'%3e%3cg mask='url(%26quot%3b%23SvgjsMask1610%26quot%3b)' fill='none'%3e%3crect width='2000' height='2000' x='0' y='0' fill='url(%26quot%3b%23SvgjsLinearGradient1611%26quot%3b)'%3e%3c/rect%3e%3cpath d='M441.2641377679323 912.4293674681361L641.5238322177609 636.7955446283106 127.94325073310827 474.22291437348053z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M202.9327899323972 1641.0685566257976L569.8849734203848 1870.3657297036489 432.2299630102484 1274.1163731378101z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M1367.295520185494 756.0685760115956L1494.83188773976 543.8124162375163 1112.679464301508 458.6359447931569z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M1308.5129693401052 1096.8935487008443L1466.6219747489695 1421.065049878921 1873.8247238116521 1021.8157911765862z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M834.4075613513239 2055.6944215432104L1049.2250922076087 2386.484410921962 1438.0013108475932 1898.8631199481588z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float1'%3e%3c/path%3e%3cpath d='M1853.683657753288 1739.6724538718872L1720.378822736695 1159.7447990791102 1333.8182334681264 1507.8055170226858z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M846.106528040625 594.1185814085512L1003.1197974604349 162.7281691228785 414.7161157549523 437.10531198874133z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M1593.9331430302657 729.2114054038318L1387.4954798388203 848.3982458182902 1669.4945720562305 1098.461320398229z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M1356.3793921072415 381.162273134487L1270.7498205650043 36.321106030147945 1043.5912939984873 248.1498589982278z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M818.8987812952641 1246.2549686586678L728.128793701972 595.896293579247 269.6910272893781 941.3539291795357z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M1815.0053015306464 214.58917508065758L1544.5926933276614-28.8914309744373 1314.5780883465115 498.4677843575876z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M1049.7496834027759 2081.845468205424L1258.7354753201407 2013.94186817864 1052.387179321283 1734.4149803159848z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M1792.9454385013928 2154.738069667301L1984.6698920047354 1890.851998153084 1492.9785579817387 1735.2083536551786z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float1'%3e%3c/path%3e%3cpath d='M1985.0066909432342 1832.9584586755361L2278.8974200350704 1663.280567122029 1877.4352181588913 1307.283419261028z' fill='rgba(28%2c 83%2c 142%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask1610'%3e%3crect width='2000' height='2000' fill='white'%3e%3c/rect%3e%3c/mask%3e%3clinearGradient x1='0%25' y1='0%25' x2='100%25' y2='100%25' gradientUnits='userSpaceOnUse' id='SvgjsLinearGradient1611'%3e%3cstop stop-color='%230e2a47' offset='0'%3e%3c/stop%3e%3cstop stop-color='%2300459e' offset='1'%3e%3c/stop%3e%3c/linearGradient%3e%3cstyle%3e %40keyframes float1 %7b 0%25%7btransform: translate(0%2c 0)%7d 50%25%7btransform: translate(-10px%2c 0)%7d 100%25%7btransform: translate(0%2c 0)%7d %7d .triangle-float1 %7b animation: float1 5s infinite%3b %7d %40keyframes float2 %7b 0%25%7btransform: translate(0%2c 0)%7d 50%25%7btransform: translate(-5px%2c -5px)%7d 100%25%7btransform: translate(0%2c 0)%7d %7d .triangle-float2 %7b animation: float2 4s infinite%3b %7d %40keyframes float3 %7b 0%25%7btransform: translate(0%2c 0)%7d 50%25%7btransform: translate(0%2c -10px)%7d 100%25%7btransform: translate(0%2c 0)%7d %7d .triangle-float3 %7b animation: float3 6s infinite%3b %7d %3c/style%3e%3c/defs%3e%3c/svg%3e")!important;
+
+/* Asegura que la imagen no se repita */
+background-repeat: no-repeat!important;
+    
+/* Asegura que la imagen cubra toda el área disponible */
+background-size: cover!important;
+
+
+
+
+
 
 }
 
