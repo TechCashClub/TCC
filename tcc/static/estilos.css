@@ -109,7 +109,7 @@ h3 {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(218, 212, 23, 0.566); /* Sombra suave para el formulario */
 }
-
+/*
 .card {
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
@@ -123,13 +123,13 @@ h3 {
     background-color: #4d606c!important;  
     color:#384d61!important;
 }
-
+*/
 .logo {
     width: 20%!important; /* Reduce el ancho a la mitad del tamaño original */
     height:auto!important; /* Mantiene la proporción del alto respecto al ancho */
 }
 
-
+/*
   
     .no-border th {
     border: none;
@@ -137,15 +137,50 @@ h3 {
   
   .hover-border td {
     border: 2px solid transparent; /* Establece un borde inicial transparente */
-    /* transition: border-color 0.3s ease;  Suaviza la transición del color del borde */
+    /* transition: border-color 0.3s ease;
+
   }
   
+ /*
+  
+  
   .hover-border tr:hover {
-    border-color: rgb(245, 245, 248); /* Cambia el color del borde al pasar el cursor */
+    border-color: rgb(245, 245, 248); 
     background-color: rgb(245, 245, 248,0.5);
     color:#234465!important;
   }
   
-  
+ */ 
+ .carousel-caption {
+    background-color: rgba(255, 255, 255, 0.5)!important; /* Blanco con opacidad del 50% */
+    color: black!important; /* Texto en negro */
+    padding: 10px; /* Espacio interior para separar el texto de los bordes */
+    border-radius: 5px; /* Bordes redondeados para la cinta */
+    max-width: 90%; /* Máximo ancho del caption para no ocupar todo el ancho del carrusel */
+    margin: 0 auto; /* Centra el caption horizontalmente */
+    bottom: 20px; /* Posición del caption desde el fondo del slider */
 
- 
+ }
+
+ div.table-responsive > table.table-custom {
+    background-color: transparent;
+    color: #fff;
+}
+
+div.table-responsive > table.table-custom th {
+    background-color: transparent;
+    color: #fff;
+}
+
+div.table-responsive > table.table-custom td {
+    background-color: transparent;
+    color: #fff;
+}
+
+
+/* Estilo para las filas de la tabla al hacer hover */
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.8); /* Blanco semitransparente */
+    color: black; /* Texto en negro */
+}
+

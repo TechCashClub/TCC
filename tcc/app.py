@@ -196,25 +196,9 @@ def index():
     
     return render_template("bienvenida.html")
     
-    
-"""
-@app.route('/', methods=['GET','POST']) #RUTA AL LOGIN
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        admin_username = os.getenv('ADMIN_USERNAME')
-        admin_password_hash = os.getenv('ADMIN_PASSWORD_HASH')
+"""   
 
-        if username == admin_username and check_password_hash(admin_password_hash, password):
-            session['logged_in'] = True  # Indica que el administrador está logueado
-            return redirect(url_for('index'))
-        else:
-            flash('Usuario o contraseña incorrectos', 'danger')
-
-    return render_template('login.html')
-"""
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])   # RUTA de login 
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -238,6 +222,29 @@ def login():
         flash('Nombre de usuario o contraseña incorrecto.')
     return render_template('login.html')
 
+"""
+
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        # Usando session para la consulta
+        user = db.session.query(Socio).filter_by(nombre=username).first()
+
+        if user and user.check_password(password):  # Suponiendo que existe la función check_password
+            login_user(user)  # Autenticación con Flask-Login
+            if user.role == 'admin':
+                return redirect(url_for('index'))
+            elif user.role == 'socio':
+                session['id_socio'] = user.id_socio  # Guarda el ID del socio en la sesión
+                return redirect(url_for('socio_dashboard'))  # Cambiado para usar la ruta sin ID
+            else:
+                flash('Acceso no autorizado.')
+                return redirect(url_for('login'))
+        flash('Nombre de usuario o contraseña incorrecto.')
+    return render_template('login.html')
+
 
 
 
@@ -249,15 +256,19 @@ def logout():
 
 
 
-
-@app.route('/socio_dashboard/<int:id_socio>') # DASHBOARD DEL SOCIO
+@app.route('/socio_dashboard')  # Sin parámetro ID en la URL
 @require_role('socio')
-def socio(id_socio):
-    info_socio = db.session.get(Socio,id_socio)
+def socio_dashboard():
+    id_socio = session.get('id_socio')
+    if not id_socio:
+        flash('No autorizado, por favor inicie sesión.')
+        return redirect(url_for('login'))
+    
+    info_socio = db.session.get(Socio, id_socio)
     if not info_socio:
         return 'Socio no encontrado', 404
-    return render_template('socio.html', nombre= info_socio.nombre, apellido=info_socio.apellido, email=info_socio.email)
 
+    return render_template('socio.html', nombre=info_socio.nombre, apellido=info_socio.apellido, email=info_socio.email)
 
 
 
@@ -297,7 +308,7 @@ def eliminar_socio(id):
 
 
 
-@app.route('/socio/<int:id_socio>/editar', methods=['GET', 'POST'])
+@app.route('/socio/<int:id_socio>/editar', methods=['GET', 'POST'])  #Ruta para editar socio
 @require_role('admin')
 def editar_socio(id_socio):
     socio = Socio.query.get_or_404(id_socio)
