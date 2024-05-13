@@ -184,3 +184,37 @@ div.table-responsive > table.table-custom td {
     color: black; /* Texto en negro */
 }
 
+
+.navbar-custom {
+    background-color: #051322; /* Azul Bootstrap */
+}
+.navbar-custom .nav-link, .navbar-custom .navbar-brand, .navbar-custom .navbar-text, .navbar-custom .dropdown-toggle {
+    color: white !important;
+}
+.navbar-custom .dropdown-menu {
+    background-color: #051322; /* Fondo oscuro para el menú desplegable */
+}
+.navbar-custom .dropdown-item {
+    color: white; /* Color blanco para los ítems del menú desplegable */
+}
+.navbar-custom .dropdown-item:hover {
+    background-color: #1a1a1a; /* Color de fondo cuando se pasa el cursor sobre un ítem del menú */
+}
+
+
+    .custom-table {
+        background-color: transparent; /* Fondo claro */
+        color: #343a40; /* Texto oscuro para contraste */
+    }
+
+    .custom-table th,
+    .custom-table td {
+        border: 1px solid #dee2e6; /* Bordes sutiles para las celdas */
+        color: #000!important;
+    }
+
+    .custom-table thead th {
+        background-color: #e9ecef; /* Un poco más oscuro para la cabecera */
+        color: #495057; /* Texto oscuro */
+    }
+

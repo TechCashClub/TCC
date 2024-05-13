@@ -1,36 +1,60 @@
 {% extends 'base.html' %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha del Socio</title>
-    <!-- Enlace a Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Enlace al CSS personalizado -->
     <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
 </head>
-<body>{% block content %} 
+<body>
+{% block content %}
     <div class="container mt-5">
-        <div class="card">
+        <!-- Tarjeta de información del socio -->
+        <div class="card mb-3">
             <div class="row no-gutters">
                 <div class="col-md-4">
                     <img src="/static/img/placeholder-image.png" class="card-img" alt="Imagen del Socio">
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
-                        <h5 class="card-title">Información del Socio</h5>
-                        <p class="card-text"><strong>Nombre:</strong> {{ nombre }}</p>
-                        <p class="card-text"><strong>Apellido:</strong> {{ apellido }}</p>
-                        <p class="card-text"><strong>Email:</strong> {{ email }}</p>
+                        <h2 class="card-title">{{ socio.nombre }} {{ socio.apellido }}</h2>
+                        <p class="card-text"><strong>Email:</strong> {{ socio.email }}</p>
+                        <p class="card-text"><small class="text-muted">Última actualización hace 3 minutos</small></p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Transacciones disponibles -->
+        <h3 class="mb-3">Transacciones Disponibles</h3>
+        <div class="list-group">
+            {% for item in transacciones_disponibles %}
+            <div class="list-group-item {{ 'border-success' if item.is_member else '' }}">
+                <h5>{{ item.producto.nombre }}</h5>  <!-- Cambiado para acceder correctamente -->
+                <p>Descripción: {{ item.producto.descripcion }}</p>
+                <p>Fecha de inicio: {{ item.transaccion.fecha_inicio.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p>Fecha de fin: {{ item.transaccion.fecha_fin.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p>Precio oficial: {{ item.producto.precio_oficial }}</p>
+                {% if item.is_member %}
+                    <span class="badge bg-success">Unido</span>
+                {% else %}
+                    <form action="{{ url_for('unirse_transaccion', transaccion_id=item.transaccion.id) }}" method="post">
+                        <button type="submit" class="btn btn-primary">Unirse</button>
+                    </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+        </div>
     </div>
-    <!-- Bootstrap JS, Popper.js, y jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>{% endblock %}
+{% endblock %}
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>
+
+

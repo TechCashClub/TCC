@@ -1,13 +1,13 @@
 from flask import Flask, render_template, flash, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.sql import func
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, current_user, login_required, logout_user
 import os
 from functools import wraps
-
+from sqlalchemy.orm import joinedload
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
@@ -59,7 +59,7 @@ db = SQLAlchemy(app)
 
 #Definición de clases: ----------------------------------------------------------------------------------------------
 
-class Admin(db.Model):
+"""class Admin(db.Model):
     id_admin = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
     apellido = db.Column(db.String(100))
@@ -68,10 +68,16 @@ class Admin(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     #productos = db.relationship('Producto', backref='admin', lazy=True)
 
-# Tabla de asociación para la relación N:N entre Socios y Productos
+"""
+# Definiciones de tablas de asociación
 socios_productos = db.Table('socios_productos',
     db.Column('id_socio', db.Integer, db.ForeignKey('socio.id_socio'), primary_key=True),
     db.Column('id_producto', db.Integer, db.ForeignKey('producto.id_producto'), primary_key=True)
+)
+
+socios_transacciones = db.Table('socios_transacciones',
+    db.Column('id_socio', db.Integer, db.ForeignKey('socio.id_socio'), primary_key=True),
+    db.Column('id_transaccion', db.Integer, db.ForeignKey('transaccion.id'), primary_key=True)
 )
 
 class Producto(db.Model):
@@ -80,13 +86,11 @@ class Producto(db.Model):
     marca = db.Column(db.String(100), nullable=False)
     caracteristicas = db.Column(db.Text, nullable=False) # tipo Text ???-------- Limitar a 1000 caracteres!!!
     ruta_imagen = db.Column(db.String(250), nullable=True) # tipo Imagen ???----- establecer ruta a la imagen
-    transaccion = db.Column(db.String(100), unique=True, nullable=True)
+    transaccion_id = db.Column(db.Integer, db.ForeignKey('transaccion.id'), unique=True, nullable=True)  # Clave foránea como identificador de transacción
     precio_oficial = db.Column(db.Float, nullable=False)
     precio_descuento = db.Column(db.Float, nullable=True)
     fecha_insercion = db.Column(db.DateTime, default=func.now()) # importar paquete DateTime
-
-
-    socios = db.relationship('Socio', secondary=socios_productos, backref=db.backref('productos', lazy='dynamic'))
+    socios = db.relationship('Socio', secondary='socios_productos', backref=db.backref('productos', lazy='dynamic'))
 
 class Socio(db.Model,UserMixin):
     id_socio = db.Column(db.Integer, primary_key=True)
@@ -108,7 +112,142 @@ class Socio(db.Model,UserMixin):
     def get_id(self):
 
         return str(self.id_socio)
+
+
+# Clase Transaccion, añadida relación con Producto
+class Transaccion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha_inicio = db.Column(db.DateTime, nullable=False, default=func.now())
+    fecha_fin = db.Column(db.DateTime, nullable=False)
+    producto_id = db.Column(db.Integer, db.ForeignKey('producto.id_producto'))
+    producto = db.relationship('Producto', foreign_keys=[producto_id], backref=db.backref('transaccion_relacionada', uselist=False))
+    socios = db.relationship('Socio', secondary='socios_transacciones', backref=db.backref('transacciones', lazy='dynamic'))
+
+    def agregar_socio(self, socio):
+        if self.fecha_inicio <= datetime.now() <= self.fecha_fin:
+            self.socios.append(socio)
+            db.session.commit()
+            print(f"Socio {socio.id_socio} agregado. Total de socios: {len(self.socios)}")
+        else:
+            print("La puja está cerrada o aún no ha comenzado.")
+
+    def calcular_descuento(self):
+        numero_de_socios = len(self.socios)
+        descuento = min(30, numero_de_socios ** 2 * 0.1)
+        return descuento
+
+
+
 #--------------------------------------------------------------------------------------------------------------------
+
+@app.route('/crear_transaccion', methods=['GET'])
+def mostrar_formulario():
+    return render_template('crear_transaccion.html')
+
+
+@app.route('/crear_transaccion', methods=['POST'])
+def procesar_formulario():
+    fecha_inicio = request.form['fecha_inicio']
+    fecha_fin = request.form['fecha_fin']
+    producto_id = request.form['producto_id']
+    
+    # Convertir las fechas de string a tipo datetime
+    from datetime import datetime
+    formato = '%Y-%m-%dT%H:%M'
+    fecha_inicio = datetime.strptime(fecha_inicio, formato)
+    fecha_fin = datetime.strptime(fecha_fin, formato)
+    
+    # Crear una nueva instancia de Transaccion
+    nueva_transaccion = Transaccion(
+        fecha_inicio=fecha_inicio,
+        fecha_fin=fecha_fin,
+        producto_id=producto_id
+    )
+    
+    # Añadir la transacción a la base de datos
+    db.session.add(nueva_transaccion)
+    db.session.commit()
+    
+    # Redirigir a otra página o mostrar un mensaje de éxito
+    return redirect(url_for('mostrar_formulario'))
+
+
+
+@app.route('/listar_transacciones')
+@login_required
+def listar_transacciones():
+    if current_user.role != 'admin':
+        flash('No tienes acceso a este recurso.','warning')  # Forbid access if the user is not an admin
+    
+    transacciones = Transaccion.query.all()
+    return render_template('listar_transacciones.html', transacciones=transacciones)
+
+@app.route('/editar_transaccion/<int:id>', methods=['GET', 'POST'])
+@login_required
+def editar_transaccion(id):
+    if current_user.role != 'admin':
+        abort(403)  # Forbid access if the user is not an admin
+    
+    transaccion = Transaccion.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        transaccion.fecha_inicio = request.form['fecha_inicio']
+        transaccion.fecha_fin = request.form['fecha_fin']
+        transaccion.producto_id = request.form['producto_id']
+        db.session.commit()
+        flash('Transacción actualizada correctamente.', 'success')
+        return redirect(url_for('listar_transacciones'))
+    
+    productos = Producto.query.all()  # Obtener todos los productos para mostrar en el formulario de edición
+    return render_template('editar_transacciones.html', transaccion=transaccion, productos=productos)
+
+
+
+@app.route('/eliminar_transaccion/<int:id>', methods=['POST'])
+@login_required
+def eliminar_transaccion(id):
+    if current_user.role != 'admin':
+        abort(403)  # Forbid access if the user is not an admin
+    
+    transaccion = Transaccion.query.get_or_404(id)
+    db.session.delete(transaccion)
+    db.session.commit()
+    flash('Transacción eliminada correctamente.', 'success')
+    return redirect(url_for('listar_transacciones'))
+
+
+
+
+@app.route('/unirse_transaccion/<int:transaccion_id>', methods=['POST'])
+@login_required
+def unirse_transaccion(transaccion_id):
+    transaccion = Transaccion.query.get_or_404(transaccion_id)
+    socio = Socio.query.get(session['id_socio'])  # Suponiendo que almacenas el ID del socio en la sesión
+
+    # Verificar si el socio ya está unido
+    if socio not in transaccion.socios:
+        transaccion.socios.append(socio)
+        db.session.commit()
+        flash('Te has unido a la transacción exitosamente!', 'success')
+    else:
+        flash('Ya estás unido a esta transacción.', 'info')
+
+    return redirect(url_for('socio_dashboard'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -255,20 +394,33 @@ def logout():
     return redirect(url_for('login'))  # Redirige al usuario a la página de login
 
 
+from datetime import datetime, timezone
 
-@app.route('/socio_dashboard')  # Sin parámetro ID en la URL
-@require_role('socio')
+@app.route('/socio_dashboard')
+@login_required
 def socio_dashboard():
-    id_socio = session.get('id_socio')
-    if not id_socio:
-        flash('No autorizado, por favor inicie sesión.')
-        return redirect(url_for('login'))
-    
-    info_socio = db.session.get(Socio, id_socio)
-    if not info_socio:
-        return 'Socio no encontrado', 404
+    socio = current_user  # Usando directamente current_user, que debería estar autenticado
 
-    return render_template('socio.html', nombre=info_socio.nombre, apellido=info_socio.apellido, email=info_socio.email)
+    # Filtrar transacciones disponibles
+    ahora = datetime.now(timezone.utc)
+    transacciones = Transaccion.query.filter(
+        Transaccion.fecha_inicio <= ahora,
+        Transaccion.fecha_fin >= ahora
+    ).all()
+
+    transacciones_disponibles = [{
+        'transaccion': transaccion,
+        'is_member': socio in transaccion.socios,
+        'producto': transaccion.producto  # Asegúrate de que cada transaccion tiene un producto asociado
+    } for transaccion in transacciones]
+
+    return render_template('socio.html', socio=socio, transacciones_disponibles=transacciones_disponibles)
+
+
+
+
+
+
 
 
 
