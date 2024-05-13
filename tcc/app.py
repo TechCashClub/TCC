@@ -203,7 +203,7 @@ def editar_transaccion(id):
 
 
 
-@app.route('/eliminar_transaccion/<int:id>', methods=['POST'])
+@app.route('/eliminar_transaccion/<int:id>', methods=['POST'])   # Eliminar transacción
 @login_required
 def eliminar_transaccion(id):
     if current_user.role != 'admin':
@@ -218,11 +218,11 @@ def eliminar_transaccion(id):
 
 
 
-@app.route('/unirse_transaccion/<int:transaccion_id>', methods=['POST'])
+@app.route('/unirse_transaccion/<int:transaccion_id>', methods=['POST'])   #Unirse a transacción
 @login_required
 def unirse_transaccion(transaccion_id):
     transaccion = Transaccion.query.get_or_404(transaccion_id)
-    socio = Socio.query.get(session['id_socio'])  # Suponiendo que almacenas el ID del socio en la sesión
+    socio = Socio.query.get(session['id_socio'])  # Suponiendo que almacenamos el ID del socio en la sesión
 
     # Verificar si el socio ya está unido
     if socio not in transaccion.socios:
@@ -363,7 +363,12 @@ def login():
 
 """
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
+def inicio():
+
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
