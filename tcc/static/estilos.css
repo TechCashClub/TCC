@@ -53,9 +53,9 @@ background-size: cover!important;
 
 min-height: 100vh!important; /* Utiliza el 100% del viewport height */
 
-background-attachment: fixed; /* Mantiene la imagen fija mientras el contenido se desplaza */
+background-attachment: fixed!important;/* Mantiene la imagen fija mientras el contenido se desplaza */
 
-
+background-position: center ;
 
 
 
@@ -218,3 +218,25 @@ div.table-responsive > table.table-custom td {
         color: #495057; /* Texto oscuro */
     }
 
+/* Estilo para el calendario de FullCalendar */
+.fc {
+    background-color: white; /* Fondo blanco */
+    color: black; /* Fuente negra */
+}
+
+/* Estilo para el encabezado del calendario */
+.fc .fc-toolbar-title {
+    color: black; /* Título en negro */
+}
+
+/* Estilo para los días del calendario */
+.fc .fc-daygrid-day-number {
+    color: black; /* Números de día en negro */
+}
+
+/* Estilo para los eventos del calendario */
+.fc-event {
+    background-color: #007bff; /* Color de fondo para los eventos */
+    border-color: #007bff; /* Color de borde para los eventos */
+    color: white; /* Texto de los eventos en blanco */
+}

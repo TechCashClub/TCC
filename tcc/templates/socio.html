@@ -1,22 +1,12 @@
 {% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha del Socio</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
-</head>
-<body>
 {% block content %}
     <div class="container mt-5">
         <!-- Tarjeta de información del socio -->
         <div class="card mb-3">
             <div class="row no-gutters">
                 <div class="col-md-4">
-                    <img src="/static/img/user_placeholder.png" class="card-img" alt="Imagen del Socio">
+                    <img src="{{ url_for('static', filename='img/user_placeholder.png') }}" class="card-img" alt="Imagen del Socio">
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
@@ -27,16 +17,19 @@
                 </div>
             </div>
         </div>
+          <!-- Calendario de transacciones -->
+          <h3 class="mb-3">Calendario de Transacciones</h3>
+          <div id="calendar" style="max-width: 100%; height: 100%;"></div>
 
         <!-- Transacciones disponibles -->
         <h3 class="mb-3">Transacciones Disponibles</h3>
-        <div class="list-group">
+        <div class="list-group mb-3">
             {% for item in transacciones_disponibles %}
             <div class="list-group-item {{ 'border-success' if item.is_member else '' }}">
-                <h5>{{ item.producto.nombre }}</h5>  <!-- Cambiado para acceder correctamente -->
+                <h5>{{ item.producto.nombre }}</h5>
                 <p>Descripción: {{ item.producto.descripcion }}</p>
-                <p>Fecha de inicio: {{ item.transaccion.fecha_inicio.strftime('%Y-%m-%d %H:%M') }}</p>
-                <p>Fecha de fin: {{ item.transaccion.fecha_fin.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p>Fecha de inicio: {{ item.transaccion.fecha_inicio }}</p>
+                <p>Fecha de fin: {{ item.transaccion.fecha_fin }}</p>
                 <p>Precio oficial: {{ item.producto.precio_oficial }}</p>
                 {% if item.is_member %}
                     <span class="badge bg-success">Unido</span>
@@ -47,13 +40,49 @@
                 {% endif %}
             </div>
             {% endfor %}
-            
         </div>
+
+      
+        
+            
+    
+    
+    
+    
     </div>
-{% endblock %}
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<!-- Coloca los scripts justo antes del cierre del body para asegurar que el DOM esté cargado -->
+<script>
+    console.log("Loading jQuery...");
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    console.log("Loading Moment.js...");
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<script>
+    console.log("Loading FullCalendar...");
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css" rel="stylesheet">
+
+<script>
+    console.log("Loading Popper.js...");
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+
+<script>
+    console.log("Loading Bootstrap...");
+</script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/js/bootstrap.min.js"></script>
+
+<script>
+    console.log("Loading main.js...");
+</script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>{% endblock %}
 </body>
 </html>
 

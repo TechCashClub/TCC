@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, request, redirect, url_for, session
+from flask import Flask, render_template, flash, request, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 from sqlalchemy.sql import func
@@ -6,11 +6,13 @@ from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, current_user, login_required, logout_user
 import os
+from os import abort
 from functools import wraps
 from sqlalchemy.orm import joinedload
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
+
 
 class FormularioRegistro(FlaskForm):
 
@@ -139,6 +141,32 @@ class Transaccion(db.Model):
 
 
 #--------------------------------------------------------------------------------------------------------------------
+
+@app.route('/calendar_events')
+
+def calendar_events():
+    require_role('socio')
+    print(f"Current user: {current_user}")  # Debugging
+    assert current_user.is_authenticated, "User is not authenticated"
+    assert hasattr(current_user, 'id_socio'), "Current user does not have attribute 'id_socio'"
+    
+    transacciones = Transaccion.query.join(socios_transacciones, Transaccion.id == socios_transacciones.c.id_transaccion).filter(socios_transacciones.c.id_socio == current_user.id_socio).all()
+    events = [
+        {
+            'title': transaccion.producto.nombre,
+            'start': transaccion.fecha_inicio.isoformat(),
+            'end': transaccion.fecha_fin.isoformat()
+        } for transaccion in transacciones
+    ]
+    print(events)  # Imprimir los datos para verificar
+    return jsonify(events)
+
+
+
+
+
+
+
 
 @app.route('/crear_transaccion', methods=['GET'])
 def mostrar_formulario():
