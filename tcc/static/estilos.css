@@ -55,7 +55,9 @@ min-height: 100vh!important; /* Utiliza el 100% del viewport height */
 
 background-attachment: fixed!important;/* Mantiene la imagen fija mientras el contenido se desplaza */
 
-background-position: center ;
+background-position: center!important ;
+
+will-change: background-image!important;
 
 
 
@@ -239,4 +241,13 @@ div.table-responsive > table.table-custom td {
     background-color: #007bff; /* Color de fondo para los eventos */
     border-color: #007bff; /* Color de borde para los eventos */
     color: white; /* Texto de los eventos en blanco */
+}
+
+
+.modal-content {
+    background-color: #fff; /* Fondo blanco para el contenido del modal */
+    color: #333; /* Texto oscuro para mejorar el contraste */
+}
+.modal-header, .modal-body, .modal-footer {
+    background: #f8f9fa; /* Un fondo ligeramente gris para las secciones del modal */
 }

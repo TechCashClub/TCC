@@ -200,7 +200,7 @@ def procesar_formulario():
     return redirect(url_for('mostrar_formulario'))
 
 
-
+"""
 @app.route('/listar_transacciones')
 @login_required
 def listar_transacciones():
@@ -209,6 +209,33 @@ def listar_transacciones():
     
     transacciones = Transaccion.query.all()
     return render_template('listar_transacciones.html', transacciones=transacciones)
+"""
+
+
+@app.route('/listar_transacciones')
+@login_required
+def listar_transacciones():
+    if current_user.role != 'admin':
+        flash('No tienes acceso a este recurso.', 'warning')
+        return redirect(url_for('login'))  # Redirige a otra página si el usuario no es administrador
+
+    transacciones_info = []
+    transacciones = Transaccion.query.options(db.joinedload(Transaccion.socios)).all()
+    for transaccion in transacciones:
+        socios_names = [socio.nombre for socio in transaccion.socios]  # Lista de nombres de socios
+        transacciones_info.append({
+            'transaccion': transaccion,
+            'socios': socios_names  # Pasamos la lista de nombres
+        })
+
+    return render_template('listar_transacciones.html', transacciones=transacciones_info)
+
+
+
+
+
+
+
 
 @app.route('/editar_transaccion/<int:id>', methods=['GET', 'POST'])
 @login_required
