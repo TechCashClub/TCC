@@ -594,6 +594,27 @@ def eliminar_producto(id):
     flash('Producto eliminado con éxito.', 'success')
     return redirect(url_for('mostrar_productos'))
 
+@app.route('/baja_socio/<int:id_socio>', methods=['POST'])
+@login_required
+def baja_socio(id_socio):
+    socio = Socio.query.get_or_404(id_socio)
+    if socio != current_user:
+        flash('No tienes permiso para realizar esta acción.', 'danger')
+        return redirect(url_for('socio_dashboard'))
+    
+    db.session.delete(socio)
+    db.session.commit()
+    
+    flash('Te has dado de baja del club.', 'success')
+    return redirect(url_for('index'))
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     with app.app_context(): # Crea un contexto de aplicación, esto es necesario para operaciones que están fuera del flujo normal de de solicitudes, como la creación de tablas al inicio de la aplicación.
         try:

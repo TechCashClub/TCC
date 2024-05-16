@@ -1,25 +1,56 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 <style>
-    .small-text { font-size: 0.8rem; } /* Clase personalizada para texto pequeño */
-    .card-title { font-size: 1rem; }   /* Reduce el tamaño del título en las tarjetas */
-    .card-text { font-size: 0.9rem; }  /* Reduce el tamaño del texto normal en las tarjetas */
+    .small-text { font-size: 0.8rem; }
+    .card-title { font-size: 1rem; }
+    .card-text { font-size: 0.9rem; }
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+    .card-img-top {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+    .card-body {
+        padding: 1.5rem;
+    }
+    .card .btn {
+        font-size: 0.85rem;
+    }
+    .badge {
+        font-size: 0.75rem;
+    }
+    .card-shadow {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+    }
+    .card-shadow:hover {
+        transform: translateY(-5px);
+    }
 </style>
 
 <div class="container mt-5">
+    <!-- Título de la ficha de socio -->
+    <h3 class="mb-4">Ficha de Socio</h3>
+
     <!-- Tarjeta de información del socio -->
-    <div class="card mb-4 shadow">
+    <div class="card mb-4 card-shadow">
         <div class="row g-0">
-            <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
-                <img src="{{ url_for('static', filename='img/user_placeholder.png') }}" class="img-fluid rounded-circle" alt="Imagen del Socio">
+            <div class="col-md-4 d-flex flex-column align-items-center justify-content-center p-3">
+                <img src="{{ url_for('static', filename='img/user_placeholder.png') }}" class="img-fluid rounded-circle mb-3" alt="Imagen del Socio">
+                <h2 class="card-title">{{ socio.nombre }} {{ socio.apellido }}</h2>
             </div>
             <div class="col-md-8">
                 <div class="card-body">
-                    <h2 class="card-title">{{ socio.nombre }} {{ socio.apellido }}</h2>
                     <p class="card-text"><strong>Email:</strong> {{ socio.email }}</p>
+                    <p class="card-text"><strong>Número de socio:</strong> {{ socio.id_socio }}</p>
                     <p class="card-text small-text"><small class="text-muted">Última actualización hace 3 minutos</small></p>
+                    <p class="card-text mt-3">Bienvenido al club. Si tienes alguna pregunta o necesitas ayuda, puedes contactarnos en <a href="mailto:info@techcashclub.shop">info@techcashclub.shop</a>.</p>
+                    <form action="{{ url_for('baja_socio', id_socio=socio.id_socio) }}" method="post" onsubmit="return confirm('¿Estás seguro de querer darte de baja del club?');">
+                        <button type="submit" class="btn btn-danger mt-3"><i class="bi bi-x-circle"></i> Darse de baja</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -27,24 +58,24 @@
 
     <!-- Calendario de transacciones -->
     <h3 class="mb-3">Calendario de Transacciones</h3>
-    <div id="calendar" class="card shadow-sm mb-4 p-3"></div>
+    <div id="calendar" class="card card-shadow mb-4 p-3"></div>
 
     <!-- Transacciones disponibles -->
     <h3 class="mb-3">Transacciones Disponibles</h3>
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for item in transacciones_disponibles %}
         <div class="col">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ url_for('static', filename= 'img/placeholder-image.png' ) }}" class="card-img-top" alt="{{ item.producto.nombre }}">
+            <div class="card h-100 card-shadow">
+                <img src="{{ url_for('static', filename='img/placeholder-image.png') }}" class="card-img-top" alt="{{ item.producto.nombre }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ item.producto.nombre }}</h5>
                     <p class="card-text small-text">{{ item.producto.descripcion }}</p>
                     <p class="card-text small-text"><strong>Inicio:</strong> {{ item.transaccion.fecha_inicio.strftime('%Y-%m-%d') }}</p>
                     <p class="card-text small-text"><strong>Cierre:</strong> {{ item.transaccion.fecha_fin.strftime('%Y-%m-%d') }}</p>
                     <p class="card-text small-text"><strong>Precio oficial:</strong> €{{ item.producto.precio_oficial }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center mt-3">
                         {% if item.is_member %}
-                        <span class="badge bg-success">Unido</span>
+                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Unido</span>
                         {% else %}
                         <form action="{{ url_for('unirse_transaccion', transaccion_id=item.transaccion.id) }}" method="post">
                             <button type="submit" class="btn btn-primary small-text">
@@ -52,17 +83,14 @@
                             </button>
                         </form>
                         {% endif %}
-                        <span class="badge bg-primary small-text">{{ item.transaccion.socios | length }} Socios</span>
+                        <span class="badge bg-primary"><i class="bi bi-people-fill"></i> {{ item.transaccion.socios|length }} Socios</span>
                     </div>
                 </div>
             </div>
         </div>
         {% endfor %}
-
-
     </div>
 </div>
-
 
 <!-- Coloca los scripts justo antes del cierre del body para asegurar que el DOM esté cargado -->
 <script>
@@ -94,8 +122,7 @@
 <script>
     console.log("Loading main.js...");
 </script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>{% endblock %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
 </body>
 </html>
-
-
