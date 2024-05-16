@@ -1,55 +1,67 @@
 {% extends 'base.html' %}
 
+
 {% block content %}
-    <div class="container mt-5">
-        <!-- Tarjeta de información del socio -->
-        <div class="card mb-3">
-            <div class="row no-gutters">
-                <div class="col-md-4">
-                    <img src="{{ url_for('static', filename='img/user_placeholder.png') }}" class="card-img" alt="Imagen del Socio">
+<style>
+    .small-text { font-size: 0.8rem; } /* Clase personalizada para texto pequeño */
+    .card-title { font-size: 1rem; }   /* Reduce el tamaño del título en las tarjetas */
+    .card-text { font-size: 0.9rem; }  /* Reduce el tamaño del texto normal en las tarjetas */
+</style>
+
+<div class="container mt-5">
+    <!-- Tarjeta de información del socio -->
+    <div class="card mb-4 shadow">
+        <div class="row g-0">
+            <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
+                <img src="{{ url_for('static', filename='img/user_placeholder.png') }}" class="img-fluid rounded-circle" alt="Imagen del Socio">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h2 class="card-title">{{ socio.nombre }} {{ socio.apellido }}</h2>
+                    <p class="card-text"><strong>Email:</strong> {{ socio.email }}</p>
+                    <p class="card-text small-text"><small class="text-muted">Última actualización hace 3 minutos</small></p>
                 </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h2 class="card-title">{{ socio.nombre }} {{ socio.apellido }}</h2>
-                        <p class="card-text"><strong>Email:</strong> {{ socio.email }}</p>
-                        <p class="card-text"><small class="text-muted">Última actualización hace 3 minutos</small></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendario de transacciones -->
+    <h3 class="mb-3">Calendario de Transacciones</h3>
+    <div id="calendar" class="card shadow-sm mb-4 p-3"></div>
+
+    <!-- Transacciones disponibles -->
+    <h3 class="mb-3">Transacciones Disponibles</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for item in transacciones_disponibles %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ url_for('static', filename= 'img/placeholder-image.png' ) }}" class="card-img-top" alt="{{ item.producto.nombre }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.producto.nombre }}</h5>
+                    <p class="card-text small-text">{{ item.producto.descripcion }}</p>
+                    <p class="card-text small-text"><strong>Inicio:</strong> {{ item.transaccion.fecha_inicio.strftime('%Y-%m-%d') }}</p>
+                    <p class="card-text small-text"><strong>Cierre:</strong> {{ item.transaccion.fecha_fin.strftime('%Y-%m-%d') }}</p>
+                    <p class="card-text small-text"><strong>Precio oficial:</strong> €{{ item.producto.precio_oficial }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if item.is_member %}
+                        <span class="badge bg-success">Unido</span>
+                        {% else %}
+                        <form action="{{ url_for('unirse_transaccion', transaccion_id=item.transaccion.id) }}" method="post">
+                            <button type="submit" class="btn btn-primary small-text">
+                                <i class="bi bi-box-arrow-in-right"></i> Unirse
+                            </button>
+                        </form>
+                        {% endif %}
+                        <span class="badge bg-primary small-text">{{ item.transaccion.socios | length }} Socios</span>
                     </div>
                 </div>
             </div>
         </div>
-          <!-- Calendario de transacciones -->
-          <h3 class="mb-3">Calendario de Transacciones</h3>
-          <div id="calendar" style="max-width: 100%; height: 100%;"></div>
+        {% endfor %}
 
-        <!-- Transacciones disponibles -->
-        <h3 class="mb-3">Transacciones Disponibles</h3>
-        <div class="list-group mb-3">
-            {% for item in transacciones_disponibles %}
-            <div class="list-group-item {{ 'border-success' if item.is_member else '' }}">
-                <h5>{{ item.producto.nombre }}</h5>
-                <p>Descripción: {{ item.producto.descripcion }}</p>
-                <p>Fecha de inicio: {{ item.transaccion.fecha_inicio }}</p>
-                <p>Fecha de fin: {{ item.transaccion.fecha_fin }}</p>
-                <p>Precio oficial: {{ item.producto.precio_oficial }}</p>
-                {% if item.is_member %}
-                    <span class="badge bg-success">Unido</span>
-                {% else %}
-                    <form action="{{ url_for('unirse_transaccion', transaccion_id=item.transaccion.id) }}" method="post">
-                        <button type="submit" class="btn btn-primary">Unirse</button>
-                    </form>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
 
-      
-        
-            
-    
-    
-    
-    
     </div>
+</div>
 
 
 <!-- Coloca los scripts justo antes del cierre del body para asegurar que el DOM esté cargado -->
