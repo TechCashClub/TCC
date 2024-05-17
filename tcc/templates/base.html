@@ -36,7 +36,9 @@
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% if current_user.role == 'admin' %}{{ url_for('index') }}{% else %}{{ url_for('socio_dashboard') }}{% endif %}">
+                {% if current_user.is_authenticated %} 
                 <i class="fas fa-home"></i> Inicio
+                {% endif %}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -83,7 +85,7 @@
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('login') }}">
-                                <i class="fas fa-sign-in-alt"></i> Login
+                                <i class="fas fa-sign-in-alt"></i>Login
                             </a>
                         </li>
                     {% endif %}
