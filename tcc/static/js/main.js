@@ -81,6 +81,7 @@ $(document).ready(function() {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         locale: 'es',  // Configuración de idioma a español
+        firstDay: 1, // Configuración para que la semana comience el lunes. 
         initialView: 'dayGridMonth',
         eventDidMount: function(info) {
             console.log(info.event);  // Verificar que los eventos se cargan correctamente

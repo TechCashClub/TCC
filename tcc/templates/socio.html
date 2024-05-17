@@ -56,7 +56,7 @@
         <div class="row g-0">
             <div class="col-md-4 d-flex flex-column align-items-center justify-content-center p-3">
                 <img src="{{ url_for('static', filename='img/user_placeholder.png') }}" class="img-fluid rounded-circle mb-3" alt="Imagen del Socio">
-                <h1 class="card-title">{{ socio.nombre }} {{ socio.apellido }}</h1>
+                <h2 class="card-title">{{ socio.nombre }} {{ socio.apellido }}</h2>
             </div>
             <div class="col-md-8">
                 <div class="card-body">
@@ -64,17 +64,52 @@
                     <p class="card-text"><strong>Número de socio:</strong> {{ socio.id_socio }}</p>
                     <p class="card-text small-text"><small class="text-muted"></small></p>
                     <p class="card-text mt-3">Bienvenido al club. Si tienes alguna pregunta o necesitas ayuda, puedes contactarnos en <a href="mailto:info@techcashclub.shop">info@techcashclub.shop</a>.</p>
-                    <form action="{{ url_for('baja_socio', id_socio=socio.id_socio) }}" method="post" onsubmit="return confirm('¿Estás seguro de querer darte de baja del club?');">
-                        <button type="submit" class="btn btn-danger mt-3"><i class="bi bi-x-circle"></i> Darse de baja</button>
-                    </form>
+                    <div class="d-flex justify-content-between mt-3">
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#infoModal">
+                            <i class="bi bi-info-circle"></i> Proceso de Elección de Transacción
+                        </button>
+                        <form action="{{ url_for('baja_socio', id_socio=socio.id_socio) }}" method="post" onsubmit="return confirm('¿Estás seguro de querer darte de baja del club?');">
+                            <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle"></i> Darse de baja</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Calendario de transacciones -->
-    <h3 class="mb-3">Calendario de Transacciones</h3>
-    <div id="calendar" class="card card-shadow mb-4 p-3"></div>
+    <!-- Modal explicativo -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Proceso de Elección de Transacción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Para elegir una transacción, sigue estos pasos:</p>
+                    <ol>
+                        <li>Revisa la lista de transacciones disponibles en la sección "Transacciones Disponibles".</li>
+                        <li>Cada transacción muestra la siguiente información:
+                            <ul>
+                                <li><strong>Nombre del Producto:</strong> El nombre del producto asociado a la transacción.</li>
+                                <li><strong>Descripción:</strong> Una breve descripción del producto.</li>
+                                <li><strong>Fechas de Inicio y Cierre:</strong> El período durante el cual la transacción está activa.</li>
+                                <li><strong>Precio Oficial:</strong> El precio original del producto.</li>
+                                <li><strong>Precio con Descuento Actual:</strong> El precio del producto con el descuento basado en el número actual de socios.</li>
+                                <li><strong>Precio con Descuento Final:</strong> El precio del producto si se alcanza el descuento máximo.</li>
+                                <li><strong>Socios Necesarios para Máximo Descuento:</strong> El número de socios requeridos para alcanzar el descuento máximo.</li>
+                            </ul>
+                        </li>
+                        <li>Para unirte a una transacción, haz clic en el botón "Unirse". Si ya estás unido, verás una insignia indicando "Unido".</li>
+                    </ol>
+                    <p class="mb-0">Si tienes alguna pregunta, no dudes en contactarnos a través de nuestro correo de soporte.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Transacciones disponibles -->
     <h3 class="mb-3">Transacciones Disponibles</h3>
@@ -86,13 +121,13 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ item.producto.nombre }}</h5>
                     <p class="card-text small-text">{{ item.producto.descripcion }}</p>
-                    <p class="card-text small-text"><strong>Número de transacción:</strong> {{ item.transaccion.id }}</p>
+                    <p class="card-text small-text"><strong>Transacción n°:</strong> {{ item.transaccion.id }}</p>
                     <p class="card-text small-text"><strong>ID del producto:</strong> {{ item.producto.id_producto }}</p>
                     <p class="card-text small-text"><strong>Inicio:</strong> {{ item.transaccion.fecha_inicio.strftime('%Y-%m-%d') }}</p>
                     <p class="card-text small-text"><strong>Cierre:</strong> {{ item.transaccion.fecha_fin.strftime('%Y-%m-%d') }}</p>
-                    <p class="card-text small-text"><strong>Precio oficial:</strong> €{{ item.producto.precio_oficial }}</p>
-                    <p class="card-text small-text"><strong>Precio con descuento actual:</strong> €{{ item.transaccion.precio_con_descuento_actual() }}</p>
-                    <p class="card-text small-text"><strong>Precio con descuento final:</strong> €{{ item.transaccion.precio_con_descuento_maximo() }}</p>
+                    <p class="card-text small-text"><strong>Precio oficial:</strong> €{{ item.producto.precio_oficial | round(2) }}</p>
+                    <p class="card-text small-text"><strong>Precio con descuento actual:</strong> €{{ item.transaccion.precio_con_descuento_actual() | round(2) }}</p>
+                    <p class="card-text small-text"><strong>Precio con descuento final:</strong> €{{ item.transaccion.precio_con_descuento_maximo() | round(2) }}</p>
                     <p class="card-text small-text"><strong>Socios necesarios para máximo descuento:</strong> {{ item.transaccion.socios_para_descuento_maximo() }}</p>
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         {% if item.is_member %}
@@ -115,9 +150,13 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- Calendario de transacciones -->
+    <h3 class="mb-3 mt-5">Calendario de Transacciones</h3>
+    <div id="calendar" class="card card-shadow mb-4 p-3"></div>
 </div>
 
-<!-- scripts justo antes del cierre del body para asegurar que el DOM esté cargado -->
+<!-- Coloca los scripts justo antes del cierre del body para asegurar que el DOM esté cargado -->
 <script>
     console.log("Loading jQuery...");
 </script>
@@ -148,6 +187,8 @@
     console.log("Loading main.js...");
 </script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+
 {% endblock %}
 </body>
 </html>
