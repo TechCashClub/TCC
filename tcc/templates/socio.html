@@ -3,11 +3,12 @@
 {% block content %}
 <style>
     .small-text { font-size: 0.8rem; }
-    .card-title { font-size: 1rem; }
+    .card-title { font-size: 1.5rem; }
     .card-text { font-size: 0.9rem; }
     .card {
         border: none;
         border-radius: 10px;
+        margin-bottom: 15px;
     }
     .card-img-top {
         border-top-left-radius: 10px;
@@ -29,6 +30,21 @@
     .card-shadow:hover {
         transform: translateY(-5px);
     }
+    .progress {
+        height: 20px;
+        background-color: #f5f5f5;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .progress-bar {
+        background-color: #28a745;
+    }
+    .alternating-bg:nth-child(odd) {
+        background-color: #f9f9f9;
+    }
+    .alternating-bg:nth-child(even) {
+        background-color: #ffffff;
+    }
 </style>
 
 <div class="container mt-5">
@@ -40,13 +56,13 @@
         <div class="row g-0">
             <div class="col-md-4 d-flex flex-column align-items-center justify-content-center p-3">
                 <img src="{{ url_for('static', filename='img/user_placeholder.png') }}" class="img-fluid rounded-circle mb-3" alt="Imagen del Socio">
-                <h2 class="card-title">{{ socio.nombre }} {{ socio.apellido }}</h2>
+                <h1 class="card-title">{{ socio.nombre }} {{ socio.apellido }}</h1>
             </div>
             <div class="col-md-8">
                 <div class="card-body">
                     <p class="card-text"><strong>Email:</strong> {{ socio.email }}</p>
                     <p class="card-text"><strong>Número de socio:</strong> {{ socio.id_socio }}</p>
-                    <p class="card-text small-text"><small class="text-muted">Última actualización hace 3 minutos</small></p>
+                    <p class="card-text small-text"><small class="text-muted"></small></p>
                     <p class="card-text mt-3">Bienvenido al club. Si tienes alguna pregunta o necesitas ayuda, puedes contactarnos en <a href="mailto:info@techcashclub.shop">info@techcashclub.shop</a>.</p>
                     <form action="{{ url_for('baja_socio', id_socio=socio.id_socio) }}" method="post" onsubmit="return confirm('¿Estás seguro de querer darte de baja del club?');">
                         <button type="submit" class="btn btn-danger mt-3"><i class="bi bi-x-circle"></i> Darse de baja</button>
@@ -65,14 +81,19 @@
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for item in transacciones_disponibles %}
         <div class="col">
-            <div class="card h-100 card-shadow">
-                <img src="{{ url_for('static', filename='img/placeholder-image.png') }}" class="card-img-top" alt="{{ item.producto.nombre }}">
+            <div class="card h-100 card-shadow alternating-bg">
+                <img src="{{ url_for('static', filename=item.producto.ruta_imagen) }}" class="card-img-top" alt="{{ item.producto.nombre }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ item.producto.nombre }}</h5>
                     <p class="card-text small-text">{{ item.producto.descripcion }}</p>
+                    <p class="card-text small-text"><strong>Número de transacción:</strong> {{ item.transaccion.id }}</p>
+                    <p class="card-text small-text"><strong>ID del producto:</strong> {{ item.producto.id_producto }}</p>
                     <p class="card-text small-text"><strong>Inicio:</strong> {{ item.transaccion.fecha_inicio.strftime('%Y-%m-%d') }}</p>
                     <p class="card-text small-text"><strong>Cierre:</strong> {{ item.transaccion.fecha_fin.strftime('%Y-%m-%d') }}</p>
                     <p class="card-text small-text"><strong>Precio oficial:</strong> €{{ item.producto.precio_oficial }}</p>
+                    <p class="card-text small-text"><strong>Precio con descuento actual:</strong> €{{ item.transaccion.precio_con_descuento_actual() }}</p>
+                    <p class="card-text small-text"><strong>Precio con descuento final:</strong> €{{ item.transaccion.precio_con_descuento_maximo() }}</p>
+                    <p class="card-text small-text"><strong>Socios necesarios para máximo descuento:</strong> {{ item.transaccion.socios_para_descuento_maximo() }}</p>
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         {% if item.is_member %}
                         <span class="badge bg-success"><i class="bi bi-check-circle"></i> Unido</span>
@@ -85,6 +106,10 @@
                         {% endif %}
                         <span class="badge bg-primary"><i class="bi bi-people-fill"></i> {{ item.transaccion.socios|length }} Socios</span>
                     </div>
+                    <!-- Barra de progreso -->
+                    <div class="progress mt-3">
+                        <div class="progress-bar" role="progressbar" style="width: {{ item.transaccion.progreso_descuento() }}%;" aria-valuenow="{{ item.transaccion.progreso_descuento() }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -92,7 +117,7 @@
     </div>
 </div>
 
-<!-- Coloca los scripts justo antes del cierre del body para asegurar que el DOM esté cargado -->
+<!-- scripts justo antes del cierre del body para asegurar que el DOM esté cargado -->
 <script>
     console.log("Loading jQuery...");
 </script>
@@ -117,7 +142,7 @@
 <script>
     console.log("Loading Bootstrap...");
 </script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/js/bootstrap.min.js"></script>
+<script src="https://stackpath.amazonaws.com/bootstrap/5.1.0/js/bootstrap.min.js"></script>
 
 <script>
     console.log("Loading main.js...");

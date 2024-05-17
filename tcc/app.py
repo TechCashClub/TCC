@@ -12,6 +12,7 @@ from sqlalchemy.orm import joinedload
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
+import math
 
 
 class FormularioRegistro(FlaskForm):
@@ -117,6 +118,8 @@ class Socio(db.Model,UserMixin):
 
 
 # Clase Transaccion, añadida relación con Producto
+
+
 class Transaccion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha_inicio = db.Column(db.DateTime, nullable=False, default=func.now())
@@ -135,9 +138,27 @@ class Transaccion(db.Model):
 
     def calcular_descuento(self):
         numero_de_socios = len(self.socios)
-        descuento = min(30, numero_de_socios ** 2 * 0.1)
+        # Supongamos que queremos alcanzar un máximo de 30% de descuento
+        max_descuento = 30
+        # Número de socios necesarios para alcanzar el descuento máximo
+        socios_para_max_descuento = 100  #  ajustar este valor basado en nuestras necesidades
+        descuento = min(max_descuento, (numero_de_socios / socios_para_max_descuento) * max_descuento)
         return descuento
 
+    def progreso_descuento(self):
+        descuento_actual = self.calcular_descuento()
+        progreso = (descuento_actual / 30) * 100  # 30 es el descuento máximo
+        return progreso
+
+    def socios_para_descuento_maximo(self):
+        # Número de socios necesarios para alcanzar el descuento máximo de 30%
+        return 100  # Valor ajustado basado en la fórmula anterior
+    
+    def precio_con_descuento_actual(self):
+        return self.producto.precio_oficial * (1 - self.calcular_descuento() / 100)
+    
+    def precio_con_descuento_maximo(self):
+        return self.producto.precio_oficial * 0.7  # 30% descuento
 
 
 #--------------------------------------------------------------------------------------------------------------------

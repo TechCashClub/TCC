@@ -33,7 +33,7 @@
             <div class="carousel-inner">
                 {% for producto in productos %}
                 <div class="carousel-item{% if loop.first %} active{% endif %}">
-                    <img src="{{ producto.ruta_imagen }}" class="d-block w-100" alt="{{ producto.nombre }}">
+                    <img src="{{ url_for('static', filename=producto.ruta_imagen) }}" class="d-block w-100" alt="{{ producto.nombre }}">
                     <div class="carousel-caption">
                         <h5>{{ producto.nombre }}</h5>
                         <p>Marca: {{ producto.marca }} - Precio: €{{ producto.precio_oficial }}{% if producto.precio_descuento %} - Descuento: €{{ producto.precio_descuento }}{% endif %}</p>
