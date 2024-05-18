@@ -7,6 +7,13 @@
     <title>Formulario de Registro</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
+
+        .long {
+
+            width: 20ch!important;
+
+        }
+        
         body {
             background-color: #f0f4f8;
             font-family: Arial, sans-serif;
@@ -56,7 +63,7 @@
                         {{ form.hidden_tag() }}
                         <div class="mb-3">
                             {{ form.nombre.label(class="form-label") }}
-                            {{ form.nombre(class="form-control") }}
+                            {{ form.nombre(class="form-control long") }}
                             {% if form.nombre.errors %}
                                 <div class="alert alert-danger">{{ form.nombre.errors[0] }}</div>
                             {% endif %}
