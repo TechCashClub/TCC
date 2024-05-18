@@ -1,5 +1,6 @@
 from flask import Flask, render_template, flash, request, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from datetime import datetime, timezone
 from sqlalchemy.sql import func
 from dotenv import load_dotenv
@@ -59,19 +60,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 db = SQLAlchemy(app)
+migrate = Migrate(app,db)
 
 #Definición de clases: ----------------------------------------------------------------------------------------------
 
-"""class Admin(db.Model):
-    id_admin = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False)
-    apellido = db.Column(db.String(100))
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    #productos = db.relationship('Producto', backref='admin', lazy=True)
 
-"""
 # Definiciones de tablas de asociación
 socios_productos = db.Table('socios_productos',
     db.Column('id_socio', db.Integer, db.ForeignKey('socio.id_socio'), primary_key=True),
@@ -94,6 +87,9 @@ class Producto(db.Model):
     precio_descuento = db.Column(db.Float, nullable=True)
     fecha_insercion = db.Column(db.DateTime, default=func.now()) # importar paquete DateTime
     socios = db.relationship('Socio', secondary='socios_productos', backref=db.backref('productos', lazy='dynamic'))
+
+    fabricante_id = db.Column(db.Integer, db.ForeignKey('fabricante.id_fabricante'), nullable=False)  # Relación con Fabricante
+
 
 class Socio(db.Model,UserMixin):
     id_socio = db.Column(db.Integer, primary_key=True)
@@ -119,7 +115,6 @@ class Socio(db.Model,UserMixin):
 
 # Clase Transaccion, añadida relación con Producto
 
-
 class Transaccion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha_inicio = db.Column(db.DateTime, nullable=False, default=func.now())
@@ -127,38 +122,65 @@ class Transaccion(db.Model):
     producto_id = db.Column(db.Integer, db.ForeignKey('producto.id_producto'))
     producto = db.relationship('Producto', foreign_keys=[producto_id], backref=db.backref('transaccion_relacionada', uselist=False))
     socios = db.relationship('Socio', secondary='socios_transacciones', backref=db.backref('transacciones', lazy='dynamic'))
+    
+    titular_transaccion = db.Column(db.Integer, db.ForeignKey('fabricante.id_fabricante'))  # Campo para relacionar con Fabricante
+    
+    transaccion_confirmada = db.Column(db.Boolean, nullable=False, default=False)  # Confirmación por el administrador
+    transaccion_exitosa = db.Column(db.Boolean, nullable=False, default=False)  # Indica si la transacción fue exitosa
+    descuento_final = db.Column(db.Float, nullable=True)  # Descuento final propuesto por el fabricante
+    max_socios = db.Column(db.Integer, nullable=False)  # Número máximo de socios/unidades
 
     def agregar_socio(self, socio):
-        if self.fecha_inicio <= datetime.now() <= self.fecha_fin:
+        if self.fecha_inicio <= datetime.now() <= self.fecha_fin and len(self.socios) < self.max_socios:
             self.socios.append(socio)
             db.session.commit()
             print(f"Socio {socio.id_socio} agregado. Total de socios: {len(self.socios)}")
         else:
-            print("La puja está cerrada o aún no ha comenzado.")
-
-    def calcular_descuento(self):
-        numero_de_socios = len(self.socios)
-        # Supongamos que queremos alcanzar un máximo de 30% de descuento
-        max_descuento = 30
-        # Número de socios necesarios para alcanzar el descuento máximo
-        socios_para_max_descuento = 100  #  ajustar este valor basado en nuestras necesidades
-        descuento = min(max_descuento, (numero_de_socios / socios_para_max_descuento) * max_descuento)
-        return descuento
-
-    def progreso_descuento(self):
-        descuento_actual = self.calcular_descuento()
-        progreso = (descuento_actual / 30) * 100  # 30 es el descuento máximo
-        return progreso
-
-    def socios_para_descuento_maximo(self):
-        # Número de socios necesarios para alcanzar el descuento máximo de 30%
-        return 100  # Valor ajustado basado en la fórmula anterior
+            print("La puja está cerrada, aún no ha comenzado, o se ha alcanzado el máximo de socios.")
     
     def precio_con_descuento_actual(self):
-        return self.producto.precio_oficial * (1 - self.calcular_descuento() / 100)
+        return self.producto.precio_oficial * (1 - self.descuento_final / 100)
     
     def precio_con_descuento_maximo(self):
-        return self.producto.precio_oficial * 0.7  # 30% descuento
+        return self.producto.precio_oficial * (1 - self.descuento_final / 100)
+
+
+# Clase fabricante 
+
+
+class Fabricante(db.Model):
+    id_fabricante = db.Column(db.Integer, primary_key=True)
+    marca = db.Column(db.String(100), nullable=False)
+    razon_social = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(512), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='fabricante')  # Campo role con valor por defecto
+    
+    productos = db.relationship('Producto', backref='fabricante', lazy=True)
+    transacciones = db.relationship('Transaccion', backref='fabricante', lazy=True)
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
+    def propone_transaccion(self, producto_id, fecha_fin, descuento_final, max_socios):
+        nueva_transaccion = Transaccion(
+            fecha_inicio=datetime.now(),
+            fecha_fin=fecha_fin,
+            producto_id=producto_id,
+            titular_transaccion=self.id_fabricante,
+            transaccion_confirmada=False,  # Por defecto no confirmada
+            transaccion_exitosa=False,  # Por defecto no exitosa
+            descuento_final=descuento_final,  # Descuento final propuesto por el fabricante
+            max_socios=max_socios  # Número máximo de socios/unidades
+        )
+        db.session.add(nueva_transaccion)
+        db.session.commit()
+        return nueva_transaccion
+
+
 
 
 #--------------------------------------------------------------------------------------------------------------------
@@ -578,13 +600,24 @@ def registro_productos():
         marca = request.form['marca']
         precio_oficial = request.form['precio_oficial']
         ruta_imagen = request.form['ruta_imagen']
+        fabricante_id = request.form['fabricante_id']
 
-        nuevo_producto = Producto(nombre=nombre, caracteristicas=caracteristicas, marca=marca, precio_oficial = precio_oficial, ruta_imagen = ruta_imagen)
+        nuevo_producto = Producto(
+            nombre=nombre, 
+            caracteristicas=caracteristicas, 
+            marca=marca, 
+            precio_oficial=precio_oficial, 
+            ruta_imagen=ruta_imagen, 
+            fabricante_id=fabricante_id
+        )
         db.session.add(nuevo_producto)
         db.session.commit()
 
         return redirect(url_for('producto_registrado'))
-    return render_template('registro_productos.html')
+
+    fabricantes = Fabricante.query.all()
+    return render_template('registro_productos.html', fabricantes=fabricantes)
+
 
 @app.route('/registrado_producto')  #RUTA DE CONFIRMACIÓN DE PRODUCTO REGISTRADO
 @require_role('admin')
