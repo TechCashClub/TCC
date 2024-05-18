@@ -16,6 +16,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 10px;
         }
         .form-width {
             width: 100%;
@@ -42,62 +43,66 @@
 </head>
 <body>
 {% block content %}
-<div class="center-form">
-    <div class="form-width">
-        <div class="container mt-5">
-            <h3>Alta de socio</h3>
-            <form method="POST" action="{{ url_for('signup') }}">
-                {{ form.hidden_tag() }}
-                <div class="mb-3">
-                    {{ form.nombre.label(class="form-label") }}
-                    {{ form.nombre(class="form-control") }}
-                    {% if form.nombre.errors %}
-                        <div class="alert alert-danger">{{ form.nombre.errors[0] }}</div>
-                    {% endif %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="form-width mx-auto">
+                <div class="container mt-5">
+                    <h3>Alta de socio</h3>
+                    <form method="POST" action="{{ url_for('signup') }}">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.nombre.label(class="form-label") }}
+                            {{ form.nombre(class="form-control") }}
+                            {% if form.nombre.errors %}
+                                <div class="alert alert-danger">{{ form.nombre.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.apellido.label(class="form-label") }}
+                            {{ form.apellido(class="form-control") }}
+                            {% if form.apellido.errors %}
+                                <div class="alert alert-danger">{{ form.apellido.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control") }}
+                            {% if form.email.errors %}
+                                <div class="alert alert-danger">{{ form.email.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control") }}
+                            {% if form.password.errors %}
+                                <div class="alert alert-danger">{{ form.password.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control") }}
+                            {% if form.username.errors %}
+                                <div class="alert alert-danger">{{ form.username.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Errores en el formulario:</strong>
+                            {% for field, errors in form.errors.items() %}
+                                {% for error in errors %}
+                                    <p>{{ form[field].label.text }}: {{ error }}</p>
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-start">
+                            <button type="submit" class="btn btn-primary">Guardar</button>&nbsp;&nbsp;
+                            <button type="reset" class="btn btn-secondary">Cancelar</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    {{ form.apellido.label(class="form-label") }}
-                    {{ form.apellido(class="form-control") }}
-                    {% if form.apellido.errors %}
-                        <div class="alert alert-danger">{{ form.apellido.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.email.label(class="form-label") }}
-                    {{ form.email(class="form-control") }}
-                    {% if form.email.errors %}
-                        <div class="alert alert-danger">{{ form.email.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.password.label(class="form-label") }}
-                    {{ form.password(class="form-control") }}
-                    {% if form.password.errors %}
-                        <div class="alert alert-danger">{{ form.password.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.username.label(class="form-label") }}
-                    {{ form.username(class="form-control") }}
-                    {% if form.username.errors %}
-                        <div class="alert alert-danger">{{ form.username.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                {% if form.errors %}
-                <div class="alert alert-danger">
-                    <strong>Errores en el formulario:</strong>
-                    {% for field, errors in form.errors.items() %}
-                        {% for error in errors %}
-                            <p>{{ form[field].label.text }}: {{ error }}</p>
-                        {% endfor %}
-                    {% endfor %}
-                </div>
-                {% endif %}
-                <div class="d-flex justify-content-start">
-                    <button type="submit" class="btn btn-primary">Guardar</button>&nbsp:&nbsp:
-                    <button type="reset" class="btn btn-secondary">Cancelar</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
