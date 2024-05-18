@@ -39,6 +39,10 @@
             background-color: #003366;
             color: white;
         }
+        .form-control {
+            max-width: 100%; /* Ensure inputs do not exceed their container */
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
@@ -97,7 +101,7 @@
                         </div>
                         {% endif %}
                         <div class="d-flex justify-content-start">
-                            <button type="submit" class="btn btn-primary">Guardar</button>&nbsp;&nbsp;
+                            <button type="submit" class="btn btn-primary">Guardar</button>
                             <button type="reset" class="btn btn-secondary">Cancelar</button>
                         </div>
                     </form>
