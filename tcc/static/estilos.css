@@ -99,9 +99,11 @@ h3 {
 
 }
 
+
+
 .container {
-    max-width: 800px; 
-    margin: auto; /* Centra el contenedor en la página */
+    
+     /* Centra el contenedor en la página */
     padding: 20px;
 }
 
@@ -251,3 +253,7 @@ div.table-responsive > table.table-custom td {
 .modal-header, .modal-body, .modal-footer {
     background: #f8f9fa; /* Un fondo ligeramente gris para las secciones del modal */
 }
+
+
+
+

@@ -13,8 +13,8 @@
         }
         .center-form {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: left;
+            align-items: left;
             min-height: 100vh;
             padding: 10px;
         }
@@ -40,18 +40,17 @@
             color: white;
         }
         .form-control {
-            max-width: 100%; /* Ensure inputs do not exceed their container */
+            max-width: 50%!important;
+            width: 50%!important;
             box-sizing: border-box;
         }
     </style>
 </head>
 <body>
 {% block content %}
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6">
-            <div class="form-width mx-auto">
-                <div class="container mt-5">
+    
+       
+                
                     <h3>Alta de socio</h3>
                     <form method="POST" action="{{ url_for('signup') }}">
                         {{ form.hidden_tag() }}
@@ -105,14 +104,12 @@
                             <button type="reset" class="btn btn-secondary">Cancelar</button>
                         </div>
                     </form>
-                </div>
+                
             </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+    
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
-</body>
+{% endblock %}</body>
 </html>
