@@ -23,20 +23,46 @@
         </div>
         
         <div class="form-group mb-3">
-            <label for="producto_id">ID del Producto:</label>
-            <input type="number" class="form-control" id="producto_id" name="producto_id" required>
+            <label for="producto_id">Producto:</label>
+            <select class="form-select" id="producto_id" name="producto_id" required>
+                {% for producto in productos %}
+                    <option value="{{ producto.id_producto }}">{{ producto.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="titular_transaccion">Titular de la Transacción:</label>
+            <select class="form-select" id="titular_transaccion" name="titular_transaccion" required>
+                {% for fabricante in fabricantes %}
+                    <option value="{{ fabricante.id_fabricante }}">{{ fabricante.razon_social }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="max_socios">Máximo de Socios:</label>
+            <input type="number" class="form-control" id="max_socios" name="max_socios" required>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="descuento_final">Descuento Final:</label>
+            <input type="number" class="form-control" id="descuento_final" name="descuento_final" step="0.01" required>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="transaccion_confirmada">Confirmar Transacción:</label>
+            <input type="checkbox" id="transaccion_confirmada" name="transaccion_confirmada">
         </div>
         
         <button type="submit" class="btn btn-primary">Crear Transacción</button>
         <button type="reset" class="btn btn-secondary">Cancelar</button>
     </form>
 </div>
-{% endblock %}
+
 <!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>{% endblock %}
 </body>
 </html>
-
-

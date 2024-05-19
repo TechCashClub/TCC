@@ -124,7 +124,6 @@ class Transaccion(db.Model):
     socios = db.relationship('Socio', secondary='socios_transacciones', backref=db.backref('transacciones', lazy='dynamic'))
     
     titular_transaccion = db.Column(db.Integer, db.ForeignKey('fabricante.id_fabricante'))  # Campo para relacionar con Fabricante
-    
     transaccion_confirmada = db.Column(db.Boolean, nullable=False, default=False)  # Confirmación por el administrador
     transaccion_exitosa = db.Column(db.Boolean, nullable=False, default=False)  # Indica si la transacción fue exitosa
     descuento_final = db.Column(db.Float, nullable=True)  # Descuento final propuesto por el fabricante
@@ -139,10 +138,20 @@ class Transaccion(db.Model):
             print("La puja está cerrada, aún no ha comenzado, o se ha alcanzado el máximo de socios.")
     
     def precio_con_descuento_actual(self):
-        return self.producto.precio_oficial * (1 - self.descuento_final / 100)
+        if self.descuento_final:
+            return self.producto.precio_oficial * (1 - self.descuento_final / 100)
+        return self.producto.precio_oficial
     
     def precio_con_descuento_maximo(self):
-        return self.producto.precio_oficial * (1 - self.descuento_final / 100)
+        if self.descuento_final:
+            return self.producto.precio_oficial * (1 - self.descuento_final / 100)
+        return self.producto.precio_oficial
+    
+    def progreso_descuento(self):
+        if self.max_socios == 0:
+            return 0
+        return len(self.socios) / self.max_socios * 100
+
 
 
 # Clase fabricante 
@@ -209,14 +218,71 @@ def calendar_events():
 
 
 
-
+"""
 
 @app.route('/crear_transaccion', methods=['GET'])
+
 def mostrar_formulario():
     return render_template('crear_transaccion.html')
 
 
-@app.route('/crear_transaccion', methods=['POST'])
+"""
+
+@app.route('/crear_transaccion', methods=['GET', 'POST'])
+@login_required
+def crear_transaccion():
+    if request.method == 'POST':
+        fecha_inicio = request.form['fecha_inicio']
+        fecha_fin = request.form['fecha_fin']
+        producto_id = request.form['producto_id']
+        titular_transaccion = request.form['titular_transaccion']
+        max_socios = request.form['max_socios']
+        descuento_final = request.form['descuento_final']
+        transaccion_confirmada = 'transaccion_confirmada' in request.form
+        
+        nueva_transaccion = Transaccion(
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            producto_id=producto_id,
+            titular_transaccion=titular_transaccion,
+            max_socios=max_socios,
+            descuento_final=descuento_final,
+            transaccion_confirmada=transaccion_confirmada
+        )
+        db.session.add(nueva_transaccion)
+        db.session.commit()
+        
+        return redirect(url_for('listar_transacciones'))
+    
+    productos = Producto.query.all()
+    fabricantes = Fabricante.query.all()
+
+    # Agregar prints para depurar
+    print("Productos:", productos)
+    print("Fabricantes:", fabricantes)
+
+    return render_template('crear_transaccion.html', productos=productos, fabricantes=fabricantes)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""@app.route('/crear_transaccion', methods=['POST'])
 def procesar_formulario():
     fecha_inicio = request.form['fecha_inicio']
     fecha_fin = request.form['fecha_fin']
@@ -240,7 +306,7 @@ def procesar_formulario():
     db.session.commit()
     
     # Redirigir a otra página o mostrar un mensaje de éxito
-    return redirect(url_for('mostrar_formulario'))
+    return redirect(url_for('mostrar_formulario'))"""
 
 
 """
@@ -514,10 +580,12 @@ def socio_dashboard():
     transacciones_disponibles = [{
         'transaccion': transaccion,
         'is_member': socio in transaccion.socios,
-        'producto': transaccion.producto  # Asegúrate de que cada transaccion tiene un producto asociado
+        'producto': transaccion.producto,  # Asegúrate de que cada transaccion tiene un producto asociado
+        'fabricante': transaccion.fabricante  # Asegúrate de que cada transaccion tiene un fabricante asociado
     } for transaccion in transacciones]
 
     return render_template('socio.html', socio=socio, transacciones_disponibles=transacciones_disponibles)
+
 
 
 
