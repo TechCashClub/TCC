@@ -47,10 +47,8 @@
 </style>
 
 <div class="container mt-5">
-    <!-- Título de la ficha de socio -->
     <h3 class="mb-4">Ficha de Socio</h3>
 
-    <!-- Tarjeta de información del socio -->
     <div class="card mb-4 card-shadow">
         <div class="row g-0">
             <div class="col-md-4 d-flex flex-column align-items-center justify-content-center p-3">
@@ -76,7 +74,6 @@
         </div>
     </div>
 
-    <!-- Modal explicativo -->
     <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -110,7 +107,6 @@
         </div>
     </div>
 
-    <!-- Transacciones disponibles -->
     <h3 class="mb-3">Transacciones Disponibles</h3>
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for item in transacciones_disponibles %}
@@ -119,10 +115,10 @@
                 <img src="{{ url_for('static', filename=item.producto.ruta_imagen) }}" class="card-img-top" alt="{{ item.producto.nombre }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ item.producto.nombre }}</h5>
-                    <p class="card-text small-text">{{ item.producto.descripcion }}</p>
+                    <p class="card-text small-text">{{ item.producto.caracteristicas }}</p>
                     <p class="card-text small-text"><strong>Transacción n°:</strong> {{ item.transaccion.id }}</p>
                     <p class="card-text small-text"><strong>ID del producto:</strong> {{ item.producto.id_producto }}</p>
-                    <p class="card-text small-text"><strong>Fabricante:</strong> {{ item.transaccion.fabricante.razon_social }}</p>
+                    <p class="card-text small-text"><strong>Fabricante:</strong> {{ item.fabricante.razon_social }}</p>
                     <p class="card-text small-text"><strong>Inicio:</strong> {{ item.transaccion.fecha_inicio.strftime('%Y-%m-%d') }}</p>
                     <p class="card-text small-text"><strong>Cierre:</strong> {{ item.transaccion.fecha_fin.strftime('%Y-%m-%d') }}</p>
                     <p class="card-text small-text"><strong>Precio oficial:</strong> €{{ "%.2f" % item.producto.precio_oficial }}</p>
@@ -141,7 +137,6 @@
                         {% endif %}
                         <span class="badge bg-primary"><i class="bi bi-people-fill"></i> {{ item.transaccion.socios|length }} Socios</span>
                     </div>
-                    <!-- Barra de progreso -->
                     <div class="progress mt-3">
                         <div class="progress-bar" role="progressbar" style="width: {{ item.transaccion.progreso_descuento() }}%;" aria-valuenow="{{ item.transaccion.progreso_descuento() }}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
@@ -151,12 +146,10 @@
         {% endfor %}
     </div>
 
-    <!-- Calendario de transacciones -->
     <h3 class="mb-3 mt-5">Calendario de Transacciones</h3>
     <div id="calendar" class="card card-shadow mb-4 p-3"></div>
 </div>
 
-<!-- Coloca los scripts justo antes del cierre del body para asegurar que el DOM esté cargado -->
 <script>
     console.log("Loading jQuery...");
 </script>

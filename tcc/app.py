@@ -193,6 +193,57 @@ class Fabricante(db.Model):
 
 
 #--------------------------------------------------------------------------------------------------------------------
+    
+#CONTROLADOR FABRICANTE
+    
+@app.route('/registro_fabricante', methods=['GET', 'POST'])
+def registro_fabricante():
+    if request.method == 'POST':
+        marca = request.form['marca']
+        razon_social = request.form['razon_social']
+        password = request.form['password']
+        email = request.form['email']
+        role = 'fabricante'
+
+        if not marca or not razon_social or not password or not email:
+            flash('Por favor, complete todos los campos.')
+            return redirect(url_for('registro_fabricante'))
+
+        hashed_password = generate_password_hash(password)
+        nuevo_fabricante = Fabricante(marca=marca, razon_social=razon_social, password=hashed_password, email=email, role=role)
+        
+        try:
+            db.session.add(nuevo_fabricante)
+            db.session.commit()
+            flash('Fabricante registrado con éxito.')
+            return redirect(url_for('registro_fabricante'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al registrar el fabricante: {str(e)}')
+            return redirect(url_for('registro_fabricante'))
+    
+    return render_template('registro_fabricante.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/calendar_events')
 
@@ -563,7 +614,7 @@ def logout():
     return redirect(url_for('login'))  # Redirige al usuario a la página de login
 
 
-from datetime import datetime, timezone
+#from datetime import datetime, timezone
 
 @app.route('/socio_dashboard')
 @login_required
